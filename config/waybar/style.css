@@ -1,0 +1,102 @@
+* {
+    border: none;
+    font-family: "Inter", "JetBrainsMono Nerd Font Propo";
+    font-size: 1.3rem;
+    
+    margin: 0;
+    padding: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+tooltip {
+  background: rgba(43, 48, 59, 0.5);
+  border: 1px solid rgba(100, 114, 125, 0.5);
+}
+tooltip label {
+  color: white;
+}
+
+#workspaces {
+    transition: all 270ms ease-in-out;
+}
+
+#workspaces button {
+    padding: 0 5px;
+    transition: all 270ms ease-in-out;
+    background: #121212;
+    color: #e8eaed;
+    border: 1px solid #434343;
+    margin: 3px;
+}
+
+#workspaces button.active {
+    min-width: 3rem;
+    background: #e8eaed;
+    color:#121212;
+    border-radius: 100px;
+    border: 0px;
+}
+
+#clock {
+    font-weight: 700;
+}
+
+#battery,
+#pulseaudio,
+#custom-notification,
+#bluetooth,
+#backlight,
+#clock {
+    background-color: #b7d8aa;
+    color: black;
+    padding: 0 5px;
+    margin: 0 10px;
+    border-radius: 8px;
+}
+
+#custom-notification {
+    background-color: #e4bcc2;
+}
+
+#bluetooth {
+    background-color: #9dc7f9;
+}
+
+#backlight {
+    background-color: #f3f88e;
+}
+
+#clock {
+    background-color: #121212;
+    color: #e8eaed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#battery.charging {
+    color: white;
+    background-color: #26A65B;
+}
+
+#battery.warning:not(.charging) {
+    background: #f53c3c;
+    color: white;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
