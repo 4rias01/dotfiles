@@ -1,29 +1,35 @@
 {
     "layer": "top",
-    "width": 1700,
-    "margin-top": 20,
+    "width": 1310,
+    "margin-top": 10,
+    "margin-bottom": -5,
     "modules-left": [
-        "hyprland/workspaces"
+        "custom/power",
+        "clock",
+        "battery"
     ],
     "modules-center": [
-        "clock"
+        "hyprland/workspaces"
     ],
     "modules-right": [
+        "network",
         "bluetooth", 
         "backlight", 
-        "battery", 
         "pulseaudio",
         "custom/notification"
     ],
 
 
-    "sway/window": {
-        "max-length": 50
-    },
-
     "battery": {
+        "bat": "BAT0",
+        "interval": 4,
+        "backend": "upower",
+
         "format": "{capacity}% {icon}",
-        "format-icons": ["", "", "", "", ""]
+        "format-icons": ["", "", "", "", ""],
+
+        "format-charging": "{capacity}% {icon}",
+        "format-icons-charging": ["", "", "", "", ""]
     },
 
     "clock": {
@@ -54,15 +60,16 @@
     },
 
     "network": {
-        "interface": "wlp2s0",
+        "interface": "wlan0",
         "format": "{ifname}",
-        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-wifi": "",
         "format-ethernet": "{ipaddr}/{cidr} 󰊗",
-        "format-disconnected": "", //An empty format will hide the module.
+        "format-disconnected": "󰖪", //An empty format will hide the module.
         "tooltip-format": "{ifname} via {gwaddr} 󰊗",
         "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
         "tooltip-format-ethernet": "{ifname} ",
         "tooltip-format-disconnected": "Disconnected",
+        "on-click": "~/.config/waybar/scripts/wifi_menu.sh",
         "max-length": 50
     },
 
@@ -86,7 +93,8 @@
     "backlight": {
         "device": "intel_backlight",
         "format": "{percent}% {icon}",
-        "format-icons": ["", ""]
+        "format-icons": [""],
+        "on-click": "~/.config/waybar/scripts/brightness_slider.sh"
     },
 
     "bluetooth": {
@@ -131,5 +139,10 @@
         "on-click": "swaync-client -t -sw",
         "on-click-right": "swaync-client -d -sw",
         "escape": true
+    },
+
+    "custom/power": {
+        "format" : "⏻",
+		"on-click": "wlogout"
     }
 }

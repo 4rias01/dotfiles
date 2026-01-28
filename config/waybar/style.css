@@ -1,7 +1,7 @@
 * {
     border: none;
     font-family: "Inter", "JetBrainsMono Nerd Font Propo";
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     
     margin: 0;
     padding: 0;
@@ -30,6 +30,7 @@ tooltip label {
     background: #121212;
     color: #e8eaed;
     border: 1px solid #434343;
+    border-radius: 100px;
     margin: 3px;
 }
 
@@ -50,16 +51,22 @@ tooltip label {
 #custom-notification,
 #bluetooth,
 #backlight,
+#custom-power,
+#network,
 #clock {
     background-color: #b7d8aa;
     color: black;
     padding: 0 5px;
-    margin: 0 10px;
+    margin: 0 5px;
     border-radius: 8px;
 }
 
+#pulseaudio {
+    background-color: #dd7cdb;
+}
+
 #custom-notification {
-    background-color: #e4bcc2;
+    background-color: #f3f88e;
 }
 
 #bluetooth {
@@ -67,7 +74,7 @@ tooltip label {
 }
 
 #backlight {
-    background-color: #f3f88e;
+    background-color: #e4bcc2;
 }
 
 #clock {
@@ -75,16 +82,10 @@ tooltip label {
     color: #e8eaed;
 }
 
-
-
-
-
-
-
-
-
-
-
+#custom-power {
+    background-color: #ff6666;
+    color: #e8eaed;
+}
 
 #battery.charging {
     color: white;
