@@ -2,7 +2,7 @@
 
 # ---- CONFIGURACION ----
 TERMINAL="kitty"
-SLEEP_TIME=0.3
+SLEEP_TIME=0.6
 
 sleep 5
 
@@ -10,7 +10,7 @@ apps=(
 	"spotify|Spotify"
 	"kitty --class cava -e cava|cava"
 	"kitty --class Pipes.sh -e pipes.sh|Pipes.sh"
-	"kitty --class Peaclock -e peaclock|Peaclock"
+	"kitty --class cmatrix -e cmatrix|cmatrix"
 	)
 
 move_to_magic() {
@@ -22,6 +22,19 @@ move_to_magic() {
   [ -n "$addr" ] && \
     hyprctl dispatch movetoworkspace special:magic,address:"$addr"
 }
+
+resize_spotify() {
+  local width=804
+  local height=716
+
+  addr=$(hyprctl clients -j | jq -r \
+    '.[] | select(.class=="spotify") | .address' | tail -n1)
+
+  if [ -n "$addr" ]; then
+    hyprctl dispatch resizewindowpixel exact $width $height,address:"$addr"
+  fi
+}
+
 
 for entry in "${apps[@]}"; do
   cmd="${entry%%|*}"
@@ -41,5 +54,8 @@ hyprctl dispatch focuswindow class:spotify
 hyprctl dispatch swapwindow u
 hyprctl dispatch focuswindow class:spotify
 hyprctl dispatch swapwindow l
+
+sleep 0.3
+resize_spotify
 
 

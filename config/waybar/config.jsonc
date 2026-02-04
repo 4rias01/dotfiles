@@ -1,7 +1,7 @@
 {
     "layer": "top",
-    "width": 1310,
-    "margin-top": 10,
+    "width": 1350,
+    "margin-top": 5,
     "margin-bottom": -5,
     "modules-left": [
         "custom/power",
