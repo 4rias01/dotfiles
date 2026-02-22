@@ -12,6 +12,14 @@ window#waybar {
     background: transparent;
 }
 
+.modules-right {
+    background: black;
+    padding: 0 5px;
+    margin: 0 5px;
+    border-radius: 8px;
+}
+
+
 tooltip {
   background: rgba(43, 48, 59, 0.5);
   border: 1px solid rgba(100, 114, 125, 0.5);
@@ -54,33 +62,33 @@ tooltip label {
 #custom-power,
 #network,
 #clock {
-    background-color: #b7d8aa;
-    color: black;
+    color: #ffffff;
+    background-color: black;
     padding: 0 5px;
     margin: 0 5px;
     border-radius: 8px;
 }
-
+/*
 #pulseaudio {
-    background-color: #dd7cdb;
+    color: #dd7cdb;
 }
 
 #custom-notification {
-    background-color: #f3f88e;
+    color: #f3f88e;
 }
 
 #bluetooth {
-    background-color: #9dc7f9;
+    color: #9dc7f9;
 }
 
 #backlight {
-    background-color: #e4bcc2;
+    color: #e4bcc2;
 }
 
 #clock {
-    background-color: #121212;
     color: #e8eaed;
 }
+*/
 
 #custom-power {
     background-color: #ff6666;

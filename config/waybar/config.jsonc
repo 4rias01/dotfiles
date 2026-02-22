@@ -5,11 +5,11 @@
     "margin-bottom": -5,
     "modules-left": [
         "custom/power",
-        "clock",
-        "battery"
+        "battery",
+        "hyprland/workspaces"
     ],
     "modules-center": [
-        "hyprland/workspaces"
+        "clock"
     ],
     "modules-right": [
         "network",
