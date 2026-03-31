@@ -1,7 +1,7 @@
 * {
     border: none;
-    font-family: "Inter", "JetBrainsMono Nerd Font Propo";
-    font-size: 1.2rem;
+    font-family: "JetbrainsMono Nerd Font" ;
+    font-size: 1.05rem;
     
     margin: 0;
     padding: 0;
@@ -10,43 +10,40 @@
 
 window#waybar {
     background: transparent;
+    transition: background-color .5s;
 }
 
-.modules-right {
-    background: black;
+.modules-left,
+.modules-right,
+.modules-center {
+    background: rgba(0, 0, 8, .7);
+    margin: 0px 10px;
+    padding: 0 10px;
+    border-radius: 10px;
+}
+.modules-left {
+    padding: 0;
+}
+.modules-center {
     padding: 0 5px;
-    margin: 0 5px;
-    border-radius: 8px;
 }
 
 
-tooltip {
-  background: rgba(43, 48, 59, 0.5);
-  border: 1px solid rgba(100, 114, 125, 0.5);
-}
-tooltip label {
-  color: white;
-}
-
-#workspaces {
-    transition: all 270ms ease-in-out;
+#workspaces button {
+    transition: all 0.2s ease;
 }
 
 #workspaces button {
-    padding: 0 5px;
-    transition: all 270ms ease-in-out;
-    background: #121212;
+    padding: 0 6px;
+    margin: 2px;
+    border-radius: 6px;
+    background: transparent;
     color: #e8eaed;
-    border: 1px solid #434343;
-    border-radius: 100px;
-    margin: 3px;
 }
 
 #workspaces button.active {
-    min-width: 3rem;
     background: #e8eaed;
     color:#121212;
-    border-radius: 100px;
     border: 0px;
 }
 
@@ -63,32 +60,11 @@ tooltip label {
 #network,
 #clock {
     color: #ffffff;
-    background-color: black;
     padding: 0 5px;
     margin: 0 5px;
     border-radius: 8px;
 }
-/*
-#pulseaudio {
-    color: #dd7cdb;
-}
 
-#custom-notification {
-    color: #f3f88e;
-}
-
-#bluetooth {
-    color: #9dc7f9;
-}
-
-#backlight {
-    color: #e4bcc2;
-}
-
-#clock {
-    color: #e8eaed;
-}
-*/
 
 #custom-power {
     background-color: #ff6666;
@@ -108,4 +84,11 @@ tooltip label {
     animation-timing-function: steps(12);
     animation-iteration-count: infinite;
     animation-direction: alternate;
+}
+
+
+#custom-launcher {
+	border-radius: 10px;
+	transition: none;
+    color: #ff0000;
 }
