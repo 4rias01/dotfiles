@@ -1,3 +1,4 @@
+/* Waybar Styles General*/
 * {
     border: none;
     font-family: "JetbrainsMono Nerd Font" ;
@@ -13,29 +14,14 @@ window#waybar {
     transition: background-color .5s;
 }
 
-.modules-left,
-.modules-right,
-.modules-center {
-    background: rgba(0, 0, 8, .7);
-    margin: 0px 10px;
-    padding: 0 10px;
-    border-radius: 10px;
-}
-.modules-left {
-    padding: 0;
-}
-.modules-center {
-    padding: 0 5px;
-}
-
-
+/* Waybar Styles Workspaces */
 #workspaces button {
     transition: all 0.2s ease;
 }
 
 #workspaces button {
     padding: 0 6px;
-    margin: 2px;
+    margin: 3px 2px;
     border-radius: 6px;
     background: transparent;
     color: #e8eaed;
@@ -47,22 +33,61 @@ window#waybar {
     border: 0px;
 }
 
+/* Waybar Styles Modules */
+.modules-left {
+    border-radius: 6px;
+    margin: 0px -35px;
+}
+
+#group-workspaces,
+#group-cpu {
+    background: rgba(0, 0, 8, .7);
+    padding: 0 5px;
+    margin: 0 45px;
+    border-radius: 6px;
+}
+
+.modules-center {
+    background: rgba(0, 0, 8, .7);
+    margin: 0px 10px;
+    padding: 0 5px;
+    border-radius: 6px;
+}
+
+.modules-right {
+    margin: 0px -15px;
+    border-radius: 6px;
+}
+
+#group-status,
+#custom-mpd {
+    background: rgba(0, 0, 8, .7);
+    padding: 0 5px;
+    margin: 0 25px;
+    border-radius: 6px;
+}
+
+
 #clock {
     font-weight: 700;
 }
 
-#battery,
-#pulseaudio,
-#custom-notification,
+
+#network,
 #bluetooth,
+#pulseaudio,
 #backlight,
 #custom-power,
-#network,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#custom-notification,
 #clock {
     color: #ffffff;
     padding: 0 5px;
-    margin: 0 5px;
-    border-radius: 8px;
+    margin: 0 6px;
+    border-radius: 6px;
 }
 
 
@@ -77,7 +102,7 @@ window#waybar {
 }
 
 #battery.warning:not(.charging) {
-    background: #f53c3c;
+    background: #b6ad01;
     color: white;
     animation-name: blink;
     animation-duration: 0.5s;
@@ -86,6 +111,15 @@ window#waybar {
     animation-direction: alternate;
 }
 
+#battery.critical:not(.charging) {
+    background: #f53c3c;
+    color: white;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
 
 #custom-launcher {
 	border-radius: 10px;

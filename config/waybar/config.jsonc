@@ -7,11 +7,15 @@
 
     // MODULOS DE LA IZQUIERDA
     "modules-left": [
-        "custom/launcher",
         //"custom/power",
-        "battery",
-        "hyprland/workspaces"
+        "group/group-workspaces",
+        "group/group-cpu"
     ],
+    "custom/launcher":{
+        "format": "  ",
+        "on-click": "rofi -show drun",
+        "on-click-right": "killall rofi"
+    },
     "custom/power": {
         "format" : "⏻",
 		"on-click": "wlogout"
@@ -19,17 +23,18 @@
     "battery": {
         "states": {
             "good": 95,
-            "warning": 20,
+            "warning": 25,
             "critical": 10
         },
         "bat": "BAT0",
         "interval": 4,
         "backend": "upower",
         "format": "{icon} {capacity}%",
-        "format-icons": ["", "", "", "", ""],
-
-        "format-charging": "{icon} {capacity}% ",
-        "format-icons-charging": ["", "", "", "", ""]
+        "format-icons":{
+            "default": ["󰂎", "󰁻", "󰁾", "󰂁", "󰁹"],
+            "charging": ["󰢟", "󰂆", "󰢝", "󰂊", "󰂅"]
+        },
+        "format-charging": "{icon} {capacity}%"
     },
     "hyprland/workspaces": {
 	    "format": "{name}",
@@ -40,6 +45,14 @@
     },
     // FIN DE MODULOS DE LA IZQUIERDA
 
+
+    "group/group-workspaces": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/launcher",
+            "hyprland/workspaces"
+        ]
+    },
 
 
     // MODULOS DEL CENTRO
@@ -59,11 +72,8 @@
 
     // MODULOS DE LA DERECHA
     "modules-right": [
-        "network",
-        "bluetooth", 
-        "backlight", 
-        "pulseaudio",
-        "custom/notification"
+        "custom/mpd",
+        "group/group-status"
     ],
     "network": {
         "interface": "wlan0",
@@ -128,42 +138,74 @@
         "on-click-right": "swaync-client -d -sw",
         "escape": true
     },
-    // FIN DE MODULOS DE LA DERECHA
-
-
-    "custom/launcher":{
-        "format": "   ",
-        "on-click": "rofi -show drun",
-        "on-click-right": "killall rofi"
+    "group/group-status": {
+        "orientation": "inherit",
+        "modules": [
+            "network",
+            "bluetooth",
+            "backlight",
+            "pulseaudio",
+            "custom/notification"
+        ]
     },
-
     "cpu": {
-        "format": "  {usage}%",
-        "tooltip": true
+        "format": " {usage}%",
+        "tooltip": true,
+        "interval": 5
     },
     "memory": {
-        "format": "  {}%",
-	"tooltip": true
+        "format": " {}%",
+	"tooltip": true,
+	"interval": 5
     },
     "temperature": {
         "interval": 10,
         "hwmon-path": "/sys/devices/platform/coretemp.0/hwmon/hwmon4/temp1_input",
         "critical-threshold": 100,
         "format-critical": " {temperatureC}",
-        "format": " {temperatureC}°C"
+        "format": "{temperatureC}°C"
     },
+    "group/group-cpu": {
+        "orientation": "inherit",
+        "modules": [
+            "battery",
+            "cpu",
+            "memory",
+            "temperature"
+        ]
+    },
+    // FIN DE MODULOS DE LA DERECHA
+    
+
+    "custom/mpd": {
+	     "exec": "~/.config/waybar/scripts/mpd-waybar.sh",
+         "interval": 0.1,
+		 "tail": true,
+		 "markup": false,
+		 "align": 0,
+		 "max-length": 30,
+		 "return-type": "text",
+		 "format": "{} |",
+  		 "on-click": "playerctl play-pause",
+         "on-scroll-up": "playerctl next",
+         "on-scroll-down": "playerctl previous"
+	},
+
 
     "mpris": {
-        "exec": "playerctl metadata --format '{{ artist }} - {{ title }}'",
-	    "format":"1{player_icon} {dynamic}",
-	    "format-paused": "{status_icon} <i>{dynamic}</i>",
-	    "player-icons": {
-		    "default": "▶",
-		    "mpv": "🎵"
-	    },
-	    "status-icons": {
-		    "paused": "⏸"
-	    },
-	    "ignored-players": ["firefox"]
-    }
+		"format": "{player_icon} {position}/{length}",
+		"format-paused": "{status_icon} <i>{position}/{length}</i>",
+		"dynamic-order": ["artist","album","title","position","length"],
+		"dynamic-len": 30,
+		"dynamic-importance-order": ["position","length","title","artist","album"],
+		"player-icons": {
+			"default": "▶",
+			"mpv": "🎵"
+		},
+		"status-icons": {
+			"paused": "⏸",
+			"stopped": "󰝛"
+		},
+        "ignored-players": ["firefox"]
+	}
 }
