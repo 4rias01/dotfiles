@@ -77,12 +77,12 @@
     ],
     "network": {
         "interface": "wlan0",
-        "format": "{ifname}",
+        "format": "󱚼  off",
         "format-wifi": "",
         "format-ethernet": "{ipaddr}/{cidr} 󰊗",
         "format-disconnected": "󰖪", //An empty format will hide the module.
         "tooltip-format": "{ifname} via {gwaddr} 󰊗",
-        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) "   ,
         "tooltip-format-ethernet": "{ifname} ",
         "tooltip-format-disconnected": "Disconnected",
         "on-click": "~/.config/waybar/scripts/wifi_menu.sh",
@@ -95,7 +95,7 @@
 	    "format-connected": " {num_connections}",
 	    "tooltip-format": "{controller_alias}\t{controller_address}",
 	    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-	    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+	    "tooltip-format-enumerate-connected": "{device_alias}\t{device_battery_percentage}%",
         "on-click": "wifi-manager --toggle"
     },
     "backlight": {
@@ -115,7 +115,7 @@
             "portable": "",
             "default": ["", ""]
         },
-        "scroll-step": 1,
+        "scroll-step": 2,
         "on-click": "pavucontrol",
         "ignored-sinks": ["Easy Effects Sink"]
     },
@@ -151,6 +151,7 @@
     "cpu": {
         "format": " {usage}%",
         "tooltip": true,
+        "on-click": "btop",
         "interval": 5
     },
     "memory": {
@@ -179,16 +180,16 @@
 
     "custom/mpd": {
 	     "exec": "~/.config/waybar/scripts/mpd-waybar.sh",
-         "interval": 0.1,
+         "interval": 1,
 		 "tail": true,
 		 "markup": false,
 		 "align": 0,
 		 "max-length": 30,
 		 "return-type": "text",
 		 "format": "{} |",
-  		 "on-click": "playerctl play-pause",
-         "on-scroll-up": "playerctl next",
-         "on-scroll-down": "playerctl previous"
+  		 "on-click": "playerctl -p spotify play-pause",
+         "on-scroll-up": "playerctl -p spotify next",
+         "on-scroll-down": "playerctl -p spotify previous"
 	},
 
 

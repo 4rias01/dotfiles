@@ -36,14 +36,14 @@ window#waybar {
 /* Waybar Styles Modules */
 .modules-left {
     border-radius: 6px;
-    margin: 0px -35px;
+    margin: 0px 0px;
 }
 
 #group-workspaces,
 #group-cpu {
     background: rgba(0, 0, 8, .7);
     padding: 0 5px;
-    margin: 0 45px;
+    margin: 0 10px;
     border-radius: 6px;
 }
 
@@ -55,7 +55,7 @@ window#waybar {
 }
 
 .modules-right {
-    margin: 0px -15px;
+    margin: 0px 0px;
     border-radius: 6px;
 }
 
@@ -63,7 +63,7 @@ window#waybar {
 #custom-mpd {
     background: rgba(0, 0, 8, .7);
     padding: 0 5px;
-    margin: 0 25px;
+    margin: 0 10px;
     border-radius: 6px;
 }
 
@@ -97,13 +97,13 @@ window#waybar {
 }
 
 #battery.charging {
-    color: white;
-    background-color: #26A65B;
+    color: rgb(17, 249, 0);
+    /* background-color: #26A65B; */
 }
 
 #battery.warning:not(.charging) {
-    background: #b6ad01;
-    color: white;
+    background: transparent;
+    color: rgb(252, 248, 10);
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: steps(12);
@@ -112,8 +112,8 @@ window#waybar {
 }
 
 #battery.critical:not(.charging) {
-    background: #f53c3c;
-    color: white;
+    /* background: #f53c3c; */
+    color: rgb(246, 0, 0);
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: steps(12);
