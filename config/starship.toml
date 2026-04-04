@@ -1,0 +1,70 @@
+format = """
+[](#ff4f4f)\
+$username\
+[](bg:#ff0000 fg:#ff4f4f)\
+$directory\
+[](fg:#ff0000 bg:#8b1a1a)\
+$git_branch\
+$git_status\
+[](fg:#8b1a1a bg:#4a0e0e)\
+$nodejs\
+$rust\
+$golang\
+$php\
+[](fg:#4a0e0e bg:#3a0808)\
+$time\
+[ ](fg:#3a0808)\
+\n$character"""
+
+[username]
+show_always = true
+style_user = "fg:#ffffff bg:#ff4f4f"
+style_root = "fg:#ffffff bg:#ff4f4f"
+format = "[ $user ]($style)"
+
+[directory]
+style = "fg:#ffffff bg:#ff0000"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = " "
+"Pictures" = " "
+
+[git_branch]
+symbol = " "
+style = "bg:#8b1a1a"
+format = '[[ $symbol $branch ](fg:#ffffff bg:#8b1a1a)]($style)'
+
+[git_status]
+style = "bg:#8b1a1a"
+format = '[[($all_status$ahead_behind )](fg:#ffffff bg:#8b1a1a)]($style)'
+
+[nodejs]
+symbol = ""
+style = "bg:#4a0e0e"
+format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#4a0e0e"
+format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:#4a0e0e"
+format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+
+[php]
+symbol = ""
+style = "bg:#4a0e0e"
+format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+
+[time]
+disabled = false
+time_format = "%R"
+style = "bg:#3a0808"
+format = '[[  $time ](fg:#ffaaaa bg:#3a0808)]($style)'

@@ -1,7 +1,8 @@
+/* Waybar Styles General*/
 * {
     border: none;
-    font-family: "Inter", "JetBrainsMono Nerd Font Propo";
-    font-size: 1.3rem;
+    font-family: "JetbrainsMono Nerd Font" ;
+    font-size: 1.05rem;
     
     margin: 0;
     padding: 0;
@@ -10,81 +11,90 @@
 
 window#waybar {
     background: transparent;
+    transition: background-color .5s;
 }
 
-tooltip {
-  background: rgba(43, 48, 59, 0.5);
-  border: 1px solid rgba(100, 114, 125, 0.5);
-}
-tooltip label {
-  color: white;
-}
-
-#workspaces {
-    transition: all 270ms ease-in-out;
+/* Waybar Styles Workspaces */
+#workspaces button {
+    transition: all 0.2s ease;
 }
 
 #workspaces button {
-    padding: 0 5px;
-    transition: all 270ms ease-in-out;
-    background: #121212;
+    padding: 0 6px;
+    margin: 3px 2px;
+    border-radius: 6px;
+    background: transparent;
     color: #e8eaed;
-    border: 1px solid #434343;
-    margin: 3px;
 }
 
 #workspaces button.active {
-    min-width: 3rem;
     background: #e8eaed;
     color:#121212;
-    border-radius: 100px;
     border: 0px;
 }
+
+/* Waybar Styles Modules */
+.modules-left {
+    border-radius: 6px;
+    margin: 0px -35px;
+}
+
+#group-workspaces,
+#group-cpu {
+    background: rgba(0, 0, 8, .7);
+    padding: 0 5px;
+    margin: 0 45px;
+    border-radius: 6px;
+}
+
+.modules-center {
+    background: rgba(0, 0, 8, .7);
+    margin: 0px 10px;
+    padding: 0 5px;
+    border-radius: 6px;
+}
+
+.modules-right {
+    margin: 0px -15px;
+    border-radius: 6px;
+}
+
+#group-status,
+#custom-mpd {
+    background: rgba(0, 0, 8, .7);
+    padding: 0 5px;
+    margin: 0 25px;
+    border-radius: 6px;
+}
+
 
 #clock {
     font-weight: 700;
 }
 
-#battery,
-#pulseaudio,
-#custom-notification,
+
+#network,
 #bluetooth,
+#pulseaudio,
 #backlight,
+#custom-power,
+#battery,
+#cpu,
+#memory,
+#temperature,
+#custom-notification,
 #clock {
-    background-color: #b7d8aa;
-    color: black;
+    color: #ffffff;
     padding: 0 5px;
-    margin: 0 10px;
-    border-radius: 8px;
+    margin: 0 6px;
+    border-radius: 6px;
 }
 
-#custom-notification {
-    background-color: #e4bcc2;
-}
 
-#bluetooth {
-    background-color: #9dc7f9;
-}
-
-#backlight {
-    background-color: #f3f88e;
-}
-
-#clock {
-    background-color: #121212;
+#custom-power {
+    background-color: #ff6666;
     color: #e8eaed;
 }
-
-
-
-
-
-
-
-
-
-
-
 
 #battery.charging {
     color: white;
@@ -92,6 +102,16 @@ tooltip label {
 }
 
 #battery.warning:not(.charging) {
+    background: #b6ad01;
+    color: white;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#battery.critical:not(.charging) {
     background: #f53c3c;
     color: white;
     animation-name: blink;
@@ -99,4 +119,10 @@ tooltip label {
     animation-timing-function: steps(12);
     animation-iteration-count: infinite;
     animation-direction: alternate;
+}
+
+#custom-launcher {
+	border-radius: 10px;
+	transition: none;
+    color: #ff0000;
 }

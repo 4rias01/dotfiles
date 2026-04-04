@@ -1,31 +1,64 @@
 {
     "layer": "top",
-    "width": 1700,
-    "margin-top": 20,
+    "margin-top": 2,
+    "margin-bottom": -6,
+
+
+
+    // MODULOS DE LA IZQUIERDA
     "modules-left": [
-        "hyprland/workspaces"
+        //"custom/power",
+        "group/group-workspaces",
+        "group/group-cpu"
     ],
+    "custom/launcher":{
+        "format": "  ",
+        "on-click": "rofi -show drun",
+        "on-click-right": "killall rofi"
+    },
+    "custom/power": {
+        "format" : "⏻",
+		"on-click": "wlogout"
+    },
+    "battery": {
+        "states": {
+            "good": 95,
+            "warning": 25,
+            "critical": 10
+        },
+        "bat": "BAT0",
+        "interval": 4,
+        "backend": "upower",
+        "format": "{icon} {capacity}%",
+        "format-icons":{
+            "default": ["󰂎", "󰁻", "󰁾", "󰂁", "󰁹"],
+            "charging": ["󰢟", "󰂆", "󰢝", "󰂊", "󰂅"]
+        },
+        "format-charging": "{icon} {capacity}%"
+    },
+    "hyprland/workspaces": {
+	    "format": "{name}",
+        "persistent-workspaces": {
+            "*": 5, // 5 workspaces by default on every monitor
+            "HDMI-A-1": 3 // but only three on HDMI-A-1
+        }
+    },
+    // FIN DE MODULOS DE LA IZQUIERDA
+
+
+    "group/group-workspaces": {
+        "orientation": "inherit",
+        "modules": [
+            "custom/launcher",
+            "hyprland/workspaces"
+        ]
+    },
+
+
+    // MODULOS DEL CENTRO
     "modules-center": [
         "clock"
     ],
-    "modules-right": [
-        "bluetooth", 
-        "backlight", 
-        "battery", 
-        "pulseaudio",
-        "custom/notification"
-    ],
-
-
-    "sway/window": {
-        "max-length": 50
-    },
-
-    "battery": {
-        "format": "{capacity}% {icon}",
-        "format-icons": ["", "", "", "", ""]
-    },
-
     "clock": {
         "format-alt": "{:%a, %d. %b  %H:%M}",
         "interval": 60,
@@ -33,86 +66,59 @@
         "format": "{:%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
+    // FIN DE MODULOS DEL CENTRO
 
+
+
+    // MODULOS DE LA DERECHA
+    "modules-right": [
+        "custom/mpd",
+        "group/group-status"
+    ],
+    "network": {
+        "interface": "wlan0",
+        "format": "{ifname}",
+        "format-wifi": "",
+        "format-ethernet": "{ipaddr}/{cidr} 󰊗",
+        "format-disconnected": "󰖪", //An empty format will hide the module.
+        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
+        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+        "tooltip-format-ethernet": "{ifname} ",
+        "tooltip-format-disconnected": "Disconnected",
+        "on-click": "~/.config/waybar/scripts/wifi_menu.sh",
+        "max-length": 50
+    },
+    "bluetooth": {
+	    // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
+	    "format": " {status}",
+	    "format-disabled": " {status}", // an empty format will hide the module
+	    "format-connected": " {num_connections}",
+	    "tooltip-format": "{controller_alias}\t{controller_address}",
+	    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+	    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "on-click": "wifi-manager --toggle"
+    },
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "format-icons": [""],
+        "on-click": "~/.config/waybar/scripts/brightness_slider.sh"
+    },
     "pulseaudio": {
-        "format": "{volume}% {icon}",
-        "format-bluetooth": "{volume}% {icon}",
+        "format": "{icon} {volume}%",
+        "format-bluetooth": " {volume}%",
         "format-muted": "",
         "format-icons": {
             "headphone": "",
-            "hands-free": "",
-            "headset": "",
             "phone": "",
             "phone-muted": "",
             "portable": "",
-            "car": "",
             "default": ["", ""]
         },
         "scroll-step": 1,
         "on-click": "pavucontrol",
         "ignored-sinks": ["Easy Effects Sink"]
     },
-
-    "network": {
-        "interface": "wlp2s0",
-        "format": "{ifname}",
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ipaddr}/{cidr} 󰊗",
-        "format-disconnected": "", //An empty format will hide the module.
-        "tooltip-format": "{ifname} via {gwaddr} 󰊗",
-        "tooltip-format-wifi": "{essid} ({signalStrength}%) ",
-        "tooltip-format-ethernet": "{ifname} ",
-        "tooltip-format-disconnected": "Disconnected",
-        "max-length": 50
-    },
-
-    "hyprland/workspaces": {
-	    "format": "{name}",
-	    "format-icons": {
-		    "1": "",
-		    "2": "",
-		    "3": "",
-		    "4": "",
-		    "5": "",
-		    "active": "",
-		    "default": ""
-	    },
-        "persistent-workspaces": {
-            "*": 5, // 5 workspaces by default on every monitor
-            "HDMI-A-1": 3 // but only three on HDMI-A-1
-        }
-    },
-
-    "backlight": {
-        "device": "intel_backlight",
-        "format": "{percent}% {icon}",
-        "format-icons": ["", ""]
-    },
-
-    "bluetooth": {
-	    // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
-	    "format": " {status}",
-	    "format-disabled": "", // an empty format will hide the module
-	    "format-connected": " {num_connections} connected",
-	    "tooltip-format": "{controller_alias}\t{controller_address}",
-	    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-	    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}"
-    },
-
-    "mpris": {
-        "exec": "playerctl metadata --format '{{ artist }} - {{ title }}'",
-	    "format":"1{player_icon} {dynamic}",
-	    "format-paused": "{status_icon} <i>{dynamic}</i>",
-	    "player-icons": {
-		    "default": "▶",
-		    "mpv": "🎵"
-	    },
-	    "status-icons": {
-		    "paused": "⏸"
-	    },
-	    "ignored-players": ["firefox"]
-    },
-
     "custom/notification": {
         "format": "{icon}",
         "format-icons": {
@@ -131,5 +137,75 @@
         "on-click": "swaync-client -t -sw",
         "on-click-right": "swaync-client -d -sw",
         "escape": true
-    }
+    },
+    "group/group-status": {
+        "orientation": "inherit",
+        "modules": [
+            "network",
+            "bluetooth",
+            "backlight",
+            "pulseaudio",
+            "custom/notification"
+        ]
+    },
+    "cpu": {
+        "format": " {usage}%",
+        "tooltip": true,
+        "interval": 5
+    },
+    "memory": {
+        "format": " {}%",
+	"tooltip": true,
+	"interval": 5
+    },
+    "temperature": {
+        "interval": 10,
+        "hwmon-path": "/sys/devices/platform/coretemp.0/hwmon/hwmon4/temp1_input",
+        "critical-threshold": 100,
+        "format-critical": " {temperatureC}",
+        "format": "{temperatureC}°C"
+    },
+    "group/group-cpu": {
+        "orientation": "inherit",
+        "modules": [
+            "battery",
+            "cpu",
+            "memory",
+            "temperature"
+        ]
+    },
+    // FIN DE MODULOS DE LA DERECHA
+    
+
+    "custom/mpd": {
+	     "exec": "~/.config/waybar/scripts/mpd-waybar.sh",
+         "interval": 0.1,
+		 "tail": true,
+		 "markup": false,
+		 "align": 0,
+		 "max-length": 30,
+		 "return-type": "text",
+		 "format": "{} |",
+  		 "on-click": "playerctl play-pause",
+         "on-scroll-up": "playerctl next",
+         "on-scroll-down": "playerctl previous"
+	},
+
+
+    "mpris": {
+		"format": "{player_icon} {position}/{length}",
+		"format-paused": "{status_icon} <i>{position}/{length}</i>",
+		"dynamic-order": ["artist","album","title","position","length"],
+		"dynamic-len": 30,
+		"dynamic-importance-order": ["position","length","title","artist","album"],
+		"player-icons": {
+			"default": "▶",
+			"mpv": "🎵"
+		},
+		"status-icons": {
+			"paused": "⏸",
+			"stopped": "󰝛"
+		},
+        "ignored-players": ["firefox"]
+	}
 }
