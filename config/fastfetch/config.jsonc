@@ -3,12 +3,12 @@
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
     "type": "kitty",
-    "source": "~/.config/fastfetch/kurisu.png",
-    "height": 15,
+    "source": "~/.config/fastfetch/logo/kurisu.png",
+    "height": 9,
     "padding": {
-      "right": 5,
-      "left": 5,
-      "top": 4
+      "right": 1,
+      "left": 1,
+      "top": 3
     }
   },
   "display": {
@@ -20,101 +20,103 @@
     }
   },
   "modules": [
-    "break",
-    {
+    //"break",
+    /*{
       "type": "title",
       "format": "                                {#red}{6}{7}{8}"
-    },
+    },*/
     "break",
     {
       "type": "custom",
-      "format": "{#red}┌──────────────────────────────────────────────────────────────────────────────┐" // `\u001b` is `\033`, or `\e`
+      "format": "{#red}┌───────────────────────────────────────────────────────┐" // `\u001b` is `\033`, or `\e`
     },
     "break",
     {
-      "key": "     OS           ",
+      "key": "     OS         ",
       "keyColor": "red",
       "type": "os"
     },
-    {
-      "key": "    󰌢 Machine      ",
+    /*{
+      "key": "    󰌢 Machine    ",
       "keyColor": "red",
       "type": "host"
     },
     {
-      "key": "     Kernel       ",
+      "key": "     Kernel     ",
       "keyColor": "red",
       "type": "kernel"
-    },
+    },*/
     {
-      "key": "    󰅐 Uptime       ",
+      "key": "    󰅐 Uptime     ",
       "keyColor": "red",
       "type": "uptime"
     },
     {
-      "key": "     Packages     ",
+      "key": "     Packages   ",
       "keyColor": "red",
       "type": "packages"
     },
     {
-      "key": "     WM           ",
+      "key": "     WM         ",
       "keyColor": "red",
       "type": "wm"
     },
     {
-      "key": "     Shell        ",
+      "key": "     Shell      ",
       "keyColor": "red",
       "type": "shell"
     },
     {
-      "key": "     Terminal     ",
+      "key": "     Terminal   ",
       "keyColor": "red",
       "type": "terminal"
     },
     {
-      "key": "     Font         ",
+      "key": "     Font       ",
       "keyColor": "red",
       "type": "terminalfont"
     },
     {
-      "key": "    󰻠 CPU          ",
+      "key": "    󰻠 CPU        ",
       "keyColor": "red",
-      "type": "cpu"
+      "type": "cpu",
+      "format": "{name:-30}" 
     },
     {
-      "key": "    󰍛 GPU          ",
+      "key": "    󰍛 GPU        ",
       "keyColor": "red",
-      "type": "gpu"
+      "type": "gpu",
+      "format": "{vendor} {name}"
     },
-    {
-      "key": "    󰑭 Memory       ",
+    /*{
+      "key": "    󰑭 Memory     ",
       "keyColor": "red",
       "type": "memory"
     },
     {
-      "key": "     Wifi         ",
+      "key": "     Wifi       ",
       "keyColor": "red",
       "type": "wifi"
     },
     {
-      "key": "    󰩟 Local IP     ",
+      "key": "    󰩟 Local IP   ",
       "keyColor": "red",
       "type": "localip",
       "compact": true
-    },
+    },*/
     "break",
     {
       "type": "custom",
-      "format": "{#red}└──────────────────────────────────────────────────────────────────────────────┘" // `\u001b` is `\033`, or `\e`
+      "format": "{#red}└───────────────────────────────────────────────────────┘" // `\u001b` is `\033`, or `\e`
     },
-    "break",
-    {
+    "break"
+    /*{
       "type": "colors",
       "paddingLeft": 34,
       "symbol": "circle",
       "block": {
         "width": 10
       }
-    }
+    }*/
   ]
 }
