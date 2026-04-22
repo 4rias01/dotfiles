@@ -13,7 +13,7 @@
     ],
     "custom/launcher":{
         "format": "  ",
-        "on-click": "rofi -show drun",
+        "on-click": "~/.config/rofi/launcher.sh",
         "on-click-right": "killall rofi"
     },
     "custom/power": {
@@ -166,15 +166,23 @@
         "format-critical": " {temperatureC}",
         "format": "{temperatureC}°C"
     },
+    "custom/ds4-battery": {
+    "exec": "~/.config/waybar/scripts/ds4-battery.sh",
+    "return-type": "json",
+    "interval": 10,
+    "tooltip": true
+    },
     "group/group-cpu": {
         "orientation": "inherit",
         "modules": [
             "battery",
             "cpu",
             "memory",
-            "temperature"
+            "temperature",
+            "custom/ds4-battery"
         ]
     },
+    
     // FIN DE MODULOS DE LA DERECHA
     
 
