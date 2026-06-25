@@ -60,10 +60,10 @@
         "clock"
     ],
     "clock": {
-        "format-alt": "{:%a, %d. %b  %H:%M}",
+        "format": "{:%I:%M %p}",
+        "format-alt": "{:%a, %d. %b  %I:%M}",
         "interval": 60,
         "tooltip": true,
-        "format": "{:%H:%M}",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
     },
     // FIN DE MODULOS DEL CENTRO
@@ -75,6 +75,12 @@
         "custom/mpd",
         "group/group-status"
     ],
+    "custom/bluetooth-file-sharing": {
+        "format": "{}",
+        "exec": "~/.config/waybar/scripts/file-sharing.sh status",
+        "on-click": "~/.config/waybar/scripts/file-sharing.sh toggle",
+        "signal": 11
+    },
     "network": {
         "interface": "wlan0",
         "format": "󱚼  off",
@@ -102,6 +108,7 @@
         "device": "intel_backlight",
         "format": "{icon} {percent}%",
         "format-icons": [""],
+        "scroll-step": 2,
         "on-click": "~/.config/waybar/scripts/brightness_slider.sh"
     },
     "pulseaudio": {
@@ -141,6 +148,7 @@
     "group/group-status": {
         "orientation": "inherit",
         "modules": [
+            "custom/bluetooth-file-sharing",
             "network",
             "bluetooth",
             "backlight",

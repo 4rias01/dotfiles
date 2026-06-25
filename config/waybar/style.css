@@ -80,6 +80,7 @@ window#waybar {
 #custom-power,
 #battery,
 #cpu,
+#custom-bluetooth-file-sharing,
 #memory,
 #temperature,
 #custom-notification,
@@ -98,7 +99,7 @@ window#waybar {
 
 #battery.charging {
     color: rgb(17, 249, 0);
-    /* background-color: #26A65B; */
+    background-color: transparent;
 }
 
 #battery.warning:not(.charging) {
