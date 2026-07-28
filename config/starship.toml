@@ -1,29 +1,29 @@
 format = """
-[](#ff4f4f)\
+[](#0040bd)\
 $username\
-[](bg:#ff0000 fg:#ff4f4f)\
+[](bg:#205af8 fg:#0040bd)\
 $directory\
-[](fg:#ff0000 bg:#8b1a1a)\
+[](fg:#205af8 bg:#0040bd)\
 $git_branch\
 $git_status\
-[](fg:#8b1a1a bg:#4a0e0e)\
+[](fg:#0040bd bg:#004cdd)\
 $nodejs\
 $rust\
 $golang\
 $php\
-[](fg:#4a0e0e bg:#3a0808)\
+[](fg:#004cdd bg:#00349d)\
 $time\
-[ ](fg:#3a0808)\
+[ ](fg:#00349d)\
 \n$character"""
 
 [username]
 show_always = true
-style_user = "fg:#ffffff bg:#ff4f4f"
-style_root = "fg:#ffffff bg:#ff4f4f"
+style_user = "fg:#ffffff bg:#0040bd"
+style_root = "fg:#ffffff bg:#0040bd"
 format = "[ $user ]($style)"
 
 [directory]
-style = "fg:#ffffff bg:#ff0000"
+style = "fg:#ffffff bg:#205af8"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -38,35 +38,35 @@ truncation_symbol = "…/"
 
 [git_branch]
 symbol = " "
-style = "bg:#8b1a1a"
-format = '[[ $symbol $branch ](fg:#ffffff bg:#8b1a1a)]($style)'
+style = "bg:#0040bd"
+format = '[[ $symbol $branch ](fg:#ffffff bg:#0040bd)]($style)'
 
 [git_status]
-style = "bg:#8b1a1a"
-format = '[[($all_status$ahead_behind )](fg:#ffffff bg:#8b1a1a)]($style)'
+style = "bg:#0040bd"
+format = '[[($all_status$ahead_behind )](fg:#ffffff bg:#0040bd)]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#4a0e0e"
-format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+style = "bg:#004cdd"
+format = '[[ $symbol ($version) ](fg:#004cdd bg:#004cdd)]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#4a0e0e"
-format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+style = "bg:#004cdd"
+format = '[[ $symbol ($version) ](fg:#004cdd bg:#004cdd)]($style)'
 
 [golang]
 symbol = ""
-style = "bg:#4a0e0e"
-format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+style = "bg:#004cdd"
+format = '[[ $symbol ($version) ](fg:#004cdd bg:#004cdd)]($style)'
 
 [php]
 symbol = ""
-style = "bg:#4a0e0e"
-format = '[[ $symbol ($version) ](fg:#ff2d2d bg:#4a0e0e)]($style)'
+style = "bg:#004cdd"
+format = '[[ $symbol ($version) ](fg:#004cdd bg:#004cdd)]($style)'
 
 [time]
 disabled = false
 time_format = "%R"
-style = "bg:#3a0808"
-format = '[[  $time ](fg:#ffaaaa bg:#3a0808)]($style)'
+style = "bg:#00349d"
+format = '[[  $time ](fg:#ffffff bg:#00349d)]($style)'

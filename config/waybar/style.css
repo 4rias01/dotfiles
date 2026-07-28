@@ -1,7 +1,7 @@
 /* Waybar Styles General*/
 * {
     border: none;
-    font-family: "JetbrainsMono Nerd Font" ;
+    font-family: "JetbrainsMono Nerd Font";
     font-size: 1.05rem;
     
     margin: 0;
@@ -17,9 +17,6 @@ window#waybar {
 /* Waybar Styles Workspaces */
 #workspaces button {
     transition: all 0.2s ease;
-}
-
-#workspaces button {
     padding: 0 6px;
     margin: 3px 2px;
     border-radius: 6px;
@@ -91,12 +88,6 @@ window#waybar {
     border-radius: 6px;
 }
 
-
-#custom-power {
-    background-color: #ff6666;
-    color: #e8eaed;
-}
-
 #battery.charging {
     color: rgb(17, 249, 0);
     background-color: transparent;
@@ -113,7 +104,6 @@ window#waybar {
 }
 
 #battery.critical:not(.charging) {
-    /* background: #f53c3c; */
     color: rgb(246, 0, 0);
     animation-name: blink;
     animation-duration: 0.5s;
@@ -125,5 +115,5 @@ window#waybar {
 #custom-launcher {
 	border-radius: 10px;
 	transition: none;
-    color: #ff0000;
+    color: #205af8;
 }
