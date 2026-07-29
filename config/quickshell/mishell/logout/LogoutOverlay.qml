@@ -2,6 +2,8 @@
 import Quickshell
 import Quickshell.Wayland
 import QtQuick
+import qs.logout
+import qs.config
 
 Variants {
     model: Quickshell.screens
@@ -26,7 +28,7 @@ Variants {
 
         Rectangle {
             anchors.fill: parent
-            color: "#cc11111b"
+            color: Theme.velo
 
             focus: true
             Keys.onPressed: event => {

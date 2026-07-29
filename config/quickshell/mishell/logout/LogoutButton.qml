@@ -1,4 +1,6 @@
 import QtQuick
+import qs.logout
+import qs.config
 
 Rectangle {
     id: root
@@ -12,17 +14,17 @@ Rectangle {
     implicitHeight: 300
     radius: 20
 
-    color: mouse.containsMouse ? "#00287f" : "#001d62"
+    color: mouse.containsMouse ? Theme.colorBotonHover : Theme.colorBoton
     border.width: 2
-    border.color: mouse.containsMouse ? "#89b4fa" : "#313244"
+    border.color: mouse.containsMouse ? Theme.colorBordeHover : Theme.colorBorde
     scale: mouse.containsMouse ? 1.08 : 1.0
     z: mouse.containsMouse ? 1 : 0
 
-    Behavior on color { ColorAnimation { duration: 120 } }
-    Behavior on border.color { ColorAnimation { duration: 120 } }
+    Behavior on color { ColorAnimation { duration: Theme.duracionColor } }
+    Behavior on border.color { ColorAnimation { duration: Theme.duracionColor } }
     Behavior on scale {
         NumberAnimation {
-            duration: 160
+            duration: Theme.duracionScale
             easing.type: Easing.OutBack
             easing.overshoot: 1.6
         }
@@ -33,9 +35,9 @@ Rectangle {
         anchors.verticalCenterOffset: -12
         
         text: root.icono
-        font.family: "JetbrainsMono Nerd Font"
+        font.family: Theme.fuente
         font.pixelSize: 70
-        color: mouse.containsMouse ? "#cba6f7" : "#bac2de"
+        color: mouse.containsMouse ? Theme.texto : Theme.textoSuave
         Behavior on color { ColorAnimation { duration: 120 } }
     }
 
@@ -47,17 +49,17 @@ Rectangle {
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            font.family: "JetbrainsMono Nerd Font"
+            font.family: Theme.fuente
             text: root.etiqueta
-            color: "#cdd6f4"
+            color: Theme.texto
             font.pixelSize:18
         }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            font.family: "JetbrainsMono Nerd Font"
+            font.family: Theme.fuente
             text: root.atajo
-            color: "#6c7086"
+            color: Theme.textoTenue
             font.pixelSize: 13
         }
     }
