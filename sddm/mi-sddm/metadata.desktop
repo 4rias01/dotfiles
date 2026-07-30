@@ -1,0 +1,16 @@
+[SddmGreeterTheme]
+Name=mi-sddm
+Description=Tema propio: reloj + formulario a la izquierda con blur parcial
+Author=tu-usuario
+License=MIT
+Type=sddm-theme
+Version=0.1
+
+# Punto de entrada QML. SDDM carga este archivo y nada mas.
+MainScript=Main.qml
+
+# Archivo de configuracion que queda expuesto en QML como el objeto `config`.
+ConfigFile=theme.conf
+
+# CRITICO: sin esto SDDM arranca el greeter Qt5 y el tema no carga.
+QtVersion=6
