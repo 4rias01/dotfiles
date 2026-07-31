@@ -6,3 +6,4 @@ config/fastfetch/config.jsonc
 config/hypr/modules/decoration.conf
 config/quickshell/mishell/config/Theme.qml
 config/starship.toml
+config/waybar/style.css

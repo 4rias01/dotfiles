@@ -128,40 +128,99 @@ PanelWindow {
         scanner.running = true
     }
 
+    // Una fila del modelo, a partir de la ruta RELATIVA que imprime find.
+    function makeEntry(rel) {
+        const cut  = rel.lastIndexOf("/")
+        const name = cut === -1 ? rel : rel.substring(cut + 1)
+        const carpeta = cut === -1 ? WallpaperConfig.etiquetaRaiz : rel.substring(0, cut)
+        const path = WallpaperConfig.wallpaperDir + "/" + rel
+
+        return {
+            fileName:   name,
+            filePath:   path,
+            thumbUrl:   root.toFileUrl(root.thumbPath(path)),
+            folderName: carpeta,
+            isVideo:    root.isVideoFile(name),
+            thumbReady: false
+        }
+    }
+
+    // ----------------------------------------------------------------------
+    //  MERGE, no clear+append.
+    //
+    //  Antes esto hacia entries.clear() y volvia a insertar las ~160 filas en
+    //  cada apertura. Costaba carisimo y no se notaba solo porque la primera
+    //  vez el carrusel esta invisible (root.ready todavia en false) y el fade
+    //  de 500 ms tapaba la recarga: destruia los 160 delegates, reseteaba todos
+    //  los thumbReady y Qt volvia a decodificar cada imagen desde cero.
+    //
+    //  Ahora se recorre el scan y el modelo EN PARALELO. Los dos vienen del
+    //  mismo `find | LC_ALL=C sort -f`, o sea en el mismo orden, asi que basta
+    //  con un merge lineal: lo que coincide no se toca, lo que aparecio se
+    //  inserta en su lugar y lo que desaparecio se borra.
+    //
+    //  Consecuencias, que son justo lo que se buscaba:
+    //    - Si no cambio nada, el modelo no se toca: cero delegates destruidos,
+    //      cero imagenes redecodificadas, y los thumbReady sobreviven. Reabrir
+    //      el picker es instantaneo siempre, no solo la primera vez.
+    //    - Si agregaste un wallpaper, entra UNA fila nueva con thumbReady en
+    //      false; thumbs.sh solo genera esa miniatura (las demas ya estan y son
+    //      mas nuevas que su original). No hace falta ningun boton de recarga.
+    // ----------------------------------------------------------------------
     function rebuild(text) {
         const lines = String(text).split("\n")
-        const carpetas = []
-        const indices = {}
         const previo = root.currentPath()
 
-        entries.clear()
-
+        // Rutas relativas del scan + set de rutas absolutas que hay AHORA en
+        // disco (el set es lo que permite decidir, cuando modelo y scan se
+        // separan, si sobra una fila vieja o falta una nueva).
+        const rels = []
+        const enDisco = ({})
         for (let i = 0; i < lines.length; i++) {
             const rel = lines[i]
             if (rel === "") continue
+            rels.push(rel)
+            enDisco[WallpaperConfig.wallpaperDir + "/" + rel] = true
+        }
 
-            const cut  = rel.lastIndexOf("/")
-            const name = cut === -1 ? rel : rel.substring(cut + 1)
-            const carpeta = cut === -1 ? WallpaperConfig.etiquetaRaiz : rel.substring(0, cut)
-            const path = WallpaperConfig.wallpaperDir + "/" + rel
+        let i = 0, j = 0
+        while (j < rels.length) {
+            if (i >= entries.count) {                 // cola: solo quedan altas
+                entries.append(root.makeEntry(rels[j]))
+                i++; j++
+                continue
+            }
 
-            entries.append({
-                fileName:   name,
-                filePath:   path,
-                thumbUrl:   root.toFileUrl(root.thumbPath(path)),
-                folderName: carpeta,
-                isVideo:    root.isVideoFile(name),
-                thumbReady: false
-            })
+            const actual = String(entries.get(i).filePath)
+            if (actual === WallpaperConfig.wallpaperDir + "/" + rels[j]) {
+                i++; j++                              // el mismo archivo: no tocar
+            } else if (enDisco[actual]) {
+                entries.insert(i, root.makeEntry(rels[j]))   // rels[j] es nuevo
+                i++; j++
+            } else {
+                entries.remove(i)                     // borrado del disco
+            }
+        }
+        // Lo que sobra al final ya no existe.
+        if (i < entries.count) entries.remove(i, entries.count - i)
 
-            indices[path] = entries.count - 1
-            if (carpetas.indexOf(carpeta) === -1) carpetas.push(carpeta)
+        // Indices y carpetas se recalculan igual: son O(n) sobre memoria, no
+        // tocan la vista.
+        const carpetas = []
+        const indices = ({})
+        for (let k = 0; k < entries.count; k++) {
+            const e = entries.get(k)
+            indices[String(e.filePath)] = k
+            const c = String(e.folderName)
+            if (carpetas.indexOf(c) === -1) carpetas.push(c)
         }
 
         root.indexByPath = indices
 
         carpetas.sort()
-        root.folderList = carpetas
+        // Reasignar folderList reconstruye todos los chips de la barra (el
+        // Repeater cuelga de filterData). Si la lista es la misma, no se toca.
+        if (String(carpetas) !== String(root.folderList)) root.folderList = carpetas
 
         // Si el filtro activo apuntaba a una carpeta que ya no existe, volver a All.
         if (root.currentFilter !== "All" && root.currentFilter !== "Video"
@@ -188,8 +247,10 @@ PanelWindow {
     //
     //  scripts/thumbs.sh va imprimiendo la ruta de cada archivo cuya miniatura
     //  esta lista; aqui se marca el item correspondiente y su tarjeta aparece.
-    //  Las que ya existen se reportan de golpe al abrir, asi que a partir de la
-    //  segunda vez el carrusel se llena de inmediato.
+    //  El script ya es incremental (solo genera lo que falta o quedo viejo), y
+    //  como el modelo sobrevive entre aperturas, la marca thumbReady tambien:
+    //  reabrir el picker no lanza ni el script, salvo que hayas agregado un
+    //  wallpaper nuevo, en cuyo caso solo se genera esa miniatura.
     // ======================================================================
     // La altura forma parte de la ruta: si cambias thumbHeight, las miniaturas
     // viejas quedan aparte y se regeneran solas (y si volves atras, se reusan).
@@ -210,8 +271,24 @@ PanelWindow {
         }
     }
 
+    // ¿Queda alguna tarjeta sin miniatura? Corta en la primera que encuentra,
+    // asi que en la apertura inicial (donde faltan todas) es O(1).
+    function faltanThumbs() {
+        for (let i = 0; i < entries.count; i++)
+            if (entries.get(i).thumbReady !== true) return true
+        return false
+    }
+
     function generateThumbs() {
         if (thumbGen.running) return
+
+        // Con el modelo ya no se resetea en cada apertura, los thumbReady
+        // sobreviven: si estan todos marcados no hay literalmente nada que
+        // hacer y ni se lanza bash. El script solo corre la primera vez de la
+        // sesion y cuando aparecio un wallpaper nuevo (fila con thumbReady en
+        // false), que es el unico caso en que hay que generar algo.
+        if (!root.faltanThumbs()) return
+
         const exts = WallpaperConfig.enableVideo
             ? WallpaperConfig.imageExtensions.concat(WallpaperConfig.videoExtensions)
             : WallpaperConfig.imageExtensions
@@ -229,12 +306,21 @@ PanelWindow {
         thumbGen.running = true
     }
 
-    // Marcas en espera de aplicarse (ver el Timer de abajo).
+    // Rutas en espera de marcarse (ver el Timer de abajo). Se guardan rutas y
+    // no indices: entre que se encolan y se aplican puede entrar un wallpaper
+    // nuevo y correr todos los indices de ahi para abajo.
     property var pendientes: []
 
     function markThumbReady(path) {
-        const i = root.indexByPath[String(path).trim()]
+        const p = String(path).trim()
+        const i = root.indexByPath[p]
         if (i === undefined) return
+
+        // Ya marcada: no hay que hacer nada. Importa porque thumbs.sh reporta
+        // TODAS las miniaturas que ya existen, no solo las que genero, y un
+        // setProperty redundante haria rebotar el binding de la tarjeta.
+        const e = entries.get(i)
+        if (!e || e.thumbReady === true) return
 
         // La tarjeta central va sola y de inmediato: es la unica que se ve
         // grande, y asi su decodificacion no compite con nadie.
@@ -243,7 +329,7 @@ PanelWindow {
             return
         }
 
-        root.pendientes.push(i)
+        root.pendientes.push(p)
         if (!flushThumbs.running) flushThumbs.start()
     }
 
@@ -262,7 +348,13 @@ PanelWindow {
         onTriggered: {
             if (root.pendientes.length === 0) { flushThumbs.stop(); return }
 
-            const lote = root.pendientes
+            // Las rutas se resuelven a indices AHORA, con el modelo tal como
+            // esta en este instante.
+            const lote = []
+            for (let n = 0; n < root.pendientes.length; n++) {
+                const i = root.indexByPath[root.pendientes[n]]
+                if (i !== undefined) lote.push(i)
+            }
             root.pendientes = []
 
             const c = view.currentIndex
@@ -372,12 +464,19 @@ PanelWindow {
     }
 
     // Mientras esto esta en true las tarjetas no animan su tamaño (ver los
-    // Behavior del delegate). Hace falta para centrar con precision: la tarjeta
+    // Behavior del delegate) y el ListView deja de imponer su rango (ver
+    // highlightRangeMode). Hace falta para centrar con precision: la tarjeta
     // central mide 3x las laterales, y si el ancho esta animandose,
     // positionViewAtIndex calcula con la geometria vieja y, como el ListView
     // usa StrictlyEnforceRange, la vista se re-ajusta a mitad de animacion y
     // termina centrada en la tarjeta vecina.
     property bool positioning: false
+
+    // Cada centerOnCurrent() se lleva un numero. Al abrir el picker la funcion
+    // se llama 3 veces (dos por currentDone -onStreamFinished y onExited- y una
+    // por rebuild), y sin esto el Qt.callLater de la PRIMERA apagaba
+    // `positioning` cuando las otras dos todavia estaban centrando.
+    property int posToken: 0
 
     // Centra la vista en el wallpaper actual. Devuelve false si no se sabe cual
     // es, o si ya no esta en la carpeta.
@@ -386,14 +485,22 @@ PanelWindow {
         const i = root.indexByPath[root.currentWallpaper]
         if (i === undefined) return false
 
+        const token = ++root.posToken
         root.positioning = true
         view.currentIndex = i
         // Salto directo: sin esto la vista viaja animada desde el indice 0.
         view.positionViewAtIndex(i, ListView.Center)
 
         Qt.callLater(() => {
+            // Si ya hay otra llamada mas nueva en vuelo, esta pasada sobra: lo
+            // unico que haria es apagar `positioning` antes de tiempo.
+            if (token !== root.posToken) return
+
             // Segunda pasada: los delegates lejanos se crean recien ahora, y con
-            // ellos la geometria real de la fila.
+            // ellos la geometria real de la fila. Se vuelve a fijar el indice
+            // ademas de la posicion, para que el estado final no dependa de en
+            // que orden llegaron el `cat` y el `find`.
+            view.currentIndex = i
             view.positionViewAtIndex(i, ListView.Center)
             root.positioning = false
             root.snapToValid()
@@ -559,7 +666,17 @@ PanelWindow {
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutQuart } }
 
         // Mantiene SIEMPRE el item actual centrado.
-        highlightRangeMode: ListView.StrictlyEnforceRange
+        //
+        // ...salvo mientras centramos a mano (root.positioning). Este modo no
+        // solo mueve la vista hacia currentIndex: tambien hace lo contrario,
+        // DEDUCE currentIndex de la posicion del contenido. Al reabrir el
+        // picker eso deshacia el `view.currentIndex = i` de centerOnCurrent(),
+        // porque la deduccion usa la geometria vieja (la tarjeta donde te
+        // habias quedado sigue midiendo 3x) y devolvia el indice anterior.
+        // Antes no se notaba: el entries.clear() dejaba la vista en -1 y no
+        // habia indice viejo contra el que pelear.
+        highlightRangeMode: root.positioning ? ListView.NoHighlightRange
+                                             : ListView.StrictlyEnforceRange
         preferredHighlightBegin: (width / 2) - ((root.itemWidth * 1.5 + root.spacing) / 2)
         preferredHighlightEnd:   (width / 2) + ((root.itemWidth * 1.5 + root.spacing) / 2)
         highlightMoveDuration: 450
@@ -687,9 +804,17 @@ PanelWindow {
                     }
                 }
 
-                // BORDE: la miniatura cargada a 1x1 px = su color promedio.
+                // BORDE: la miniatura cargada a 2x2 px = su color promedio.
                 // Truco barato y bonito: cada tarjeta se enmarca con su propio tono.
                 // (los videos van con el color de acento, para distinguirlos)
+                //
+                // 2x2 y no 1x1: con fillMode Stretch, Qt decodifica a
+                // original * min(anchoPedido/ancho, altoPedido/alto). Pidiendo
+                // 1x1 sobre una miniatura de 1037x500 el alto da 500/1037 =
+                // 0.48, que REDONDEA A 0, y QImageReader falla entero ("Unable
+                // to read image data"). Con eso, todo wallpaper de 2:1 o mas
+                // -panoramicas, ultrawide- se quedaba sin borde de color y sin
+                // placeholder. Pidiendo 2x2 aguanta hasta 4:1.
                 Rectangle {
                     anchors.fill: parent
                     color: card.isVideo ? Theme.acento : Theme.bordeChip
@@ -697,7 +822,7 @@ PanelWindow {
                 Image {
                     anchors.fill: parent
                     source: card.isVideo ? "" : card.imgSource
-                    sourceSize: Qt.size(1, 1)
+                    sourceSize: Qt.size(2, 2)
                     fillMode: Image.Stretch
                     asynchronous: true
                     visible: !card.isVideo
@@ -711,13 +836,14 @@ PanelWindow {
 
                     Rectangle { anchors.fill: parent; color: Theme.fondoTarjeta }
 
-                    // PLACEHOLDER: la miniatura a 1x1 px estirada, o sea su color
+                    // PLACEHOLDER: la miniatura a 2x2 px estirada, o sea su color
                     // promedio. Tapa el instante entre que la miniatura esta
                     // lista y que termina de decodificarse a tamaño completo.
+                    // (el porque de 2x2 y no 1x1, en el borde de arriba)
                     Image {
                         anchors.fill: parent
                         source: card.isVideo ? "" : card.imgSource
-                        sourceSize: Qt.size(1, 1)
+                        sourceSize: Qt.size(2, 2)
                         fillMode: Image.Stretch
                         asynchronous: true
                         visible: !card.isVideo && foto.status !== Image.Ready
@@ -760,7 +886,19 @@ PanelWindow {
                         source: card.imgSource
                         // Limita la resolucion en memoria: sin esto, 20 fotos 4K
                         // se comen varios GB de RAM.
-                        sourceSize.height: Math.round(root.itemHeight * 1.6)
+                        //
+                        // Ojo con este numero: con fillMode PreserveAspectCrop,
+                        // sourceSize NO es un tope, es el tamaño al que Qt deja
+                        // la imagen al decodificarla, y ESCALA HACIA ARRIBA si
+                        // le pides mas de lo que mide el archivo. Pidiendo 1.6x
+                        // itemHeight se agrandaba la miniatura de 500 px al
+                        // decodificarla para despues dibujarla a ~320: el doble
+                        // de pixeles por tarjeta, para nada. Ahora se pide lo
+                        // que de verdad se dibuja (con un 10% de aire por el
+                        // recorte lateral), y nunca mas alto que la miniatura.
+                        sourceSize.height: Math.min(
+                            WallpaperConfig.thumbHeight,
+                            Math.round((root.itemHeight + root.s(30)) * 1.1))
                         asynchronous: true
                         cache: true
 

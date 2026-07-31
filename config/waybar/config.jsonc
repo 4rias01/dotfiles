@@ -13,8 +13,7 @@
     ],
     "custom/launcher":{
         "format": "  ",
-        //"on-click": "~/.config/rofi/launcher.sh",
-        "on-click": "wlogout",
+        "on-click": "~/.config/rofi/launcher.sh",
         "on-click-right": "killall rofi"
     },
     "custom/power": {

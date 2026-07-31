@@ -73,6 +73,6 @@ Singleton {
     //  Las comillas de "$WALLPAPER" no son opcionales: hay wallpapers con
     //  espacios en el nombre y sin ellas ucs recibiria dos argumentos.
     property string postCommand: `
-        ucs automatic --from-image "$WALLPAPER" --mode shading --colors 7 --shuffle 1 || true
+        ucs automatic --from-image "$WALLPAPER" --mode shading --colors 7 || true
     `
 }
