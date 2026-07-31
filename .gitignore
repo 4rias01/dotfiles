@@ -4,6 +4,7 @@ __pycache__/
 
 config/fastfetch/config.jsonc
 config/hypr/modules/decoration.conf
+config/hypr/modules/decoration.lua
 config/quickshell/mishell/config/Theme.qml
 config/starship.toml
 config/waybar/style.css
