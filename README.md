@@ -425,12 +425,8 @@ propósito y solo silencia el popup de recarga exitosa).
       módulo `custom/power` que quedó huérfano en `waybar/config.jsonc`.
 - [ ] Los `modules/*.conf` viejos siguen ahí como respaldo de la migración a Lua; se van
       cuando la config en Lua esté rodada.
-- [ ] `.gitignore` todavía lista `config/hypr/modules/decoration.conf`, pero `ucs` ahora
-      escribe `decoration.lua` — o sea que los cambios de color de ese archivo sí ensucian
-      el `git status`. Hay que actualizar la ruta.
 - [ ] Los archivos que genera `ucs` están en `.gitignore` **pero ya estaban trackeados**,
-      así que `.gitignore` no los excluye. Para que surta efecto:
-      `git rm --cached <archivo>`.
+      esto es así para no ensuciar commits con los cambios de colores.
 - [ ] `smart_fill.sh` quedó obsoleto: el picker aplica la misma regla, pero sacando el
       tamaño de pantalla del monitor en vez de tenerlo hardcodeado en 1920×1080.
 - [ ] `hyprpaper.conf` sigue en el repo pero no se usa (los fondos los pone `awww`).
