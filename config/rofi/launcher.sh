@@ -1,5 +1,5 @@
 #!/bin/bash
-WALLPAPER=$(grep 'wallpaper =' ~/.config/waypaper/config.ini | cut -d' ' -f3 | sed "s|~|$HOME|")
+WALLPAPER=$(cat ~/.cache/quickshell-wallpaper/current)
 CROPPED="/tmp/rofi_wallpaper.jpg"
 LAST_USED="/tmp/rofi_last_wallpaper"
 
