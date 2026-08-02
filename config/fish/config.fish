@@ -1,14 +1,19 @@
 source /usr/share/cachyos-fish-config/cachyos-config.fish
 
-# overwrite greeting
-# potentially disabling fastfetch
+# Alias corregidos (sin el signo '=' y con argumentos separados)
+alias peaclock "peaclock --config-dir ~/.config/peaclock"
+alias aq "asciiquarium"
+
+# Overwrite greeting
 function fish_greeting
-    # smth smth
+    # Tu configuración personalizada aquí (vacío deshabilita el saludo)
 end
 
+# Inicialización de Starship Prompt
 starship init fish | source
-# SSH agent (fish)
+
+# SSH agent (fish) - Corregido error tipográfico en la ruta (.ssh)
 #if not set -q SSH_AUTH_SOCK
-#	ssh-agent -c | source
-#	ssh-add ~/.shh/id_ed25519 >/dev/null 2>&1
+#    ssh-agent -c | source
+#    ssh-add ~/.ssh/id_ed25519 >/dev/null 2>&1
 #end

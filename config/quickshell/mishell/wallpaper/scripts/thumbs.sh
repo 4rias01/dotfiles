@@ -31,8 +31,15 @@ set -uo pipefail
 
 # --- modo interno: generar UNA miniatura -----------------------------------
 #     Se invoca a si mismo por cada archivo via xargs -P (en paralelo).
+#
+#     El picker tambien lo llama desde afuera al aplicar un wallpaper, para
+#     asegurarse de que la miniatura a la que va a apuntar current_symlink
+#     existe. De ahi el mkdir: en ese caso puede que el directorio de
+#     miniaturas todavia no este creado.
 if [ "${1:-}" = "--one" ]; then
     height="$2"; src="$3"; thumb="$4"
+
+    mkdir -p "$(dirname "$thumb")" || exit 1
 
     # Se escribe a un temporal y se mueve al final. El mv es atomico dentro del
     # mismo filesystem, asi que el picker nunca ve un JPEG a medio escribir.

@@ -72,7 +72,7 @@ Variants {
                     icono: "\uf08b"
                     etiqueta: "Cerrar sesión"
                     atajo: "E"
-                    onActivado: LogoutState.ejecutar(["hyprctl", "dispatch", "exit"])
+                    onActivado: LogoutState.ejecutar(["uwsm", "stop"])
                 }
                 LogoutButton {
                     icono: "\uf04c"

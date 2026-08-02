@@ -318,28 +318,41 @@ de [ilyamiro/nixos-configuration](https://github.com/ilyamiro/nixos-configuratio
    (`xargs -P`), y las va reportando **abriéndose desde la tarjeta central hacia los dos
    lados**, para que lo que estás mirando se llene primero. Es incremental: la segunda vez
    no lanza ni un proceso.
-3. **Aplicar.** Imágenes por `awww` (levanta `awww-daemon` si no responde, transición al
-   azar), videos por `mpvpaper` (matando el anterior). El *crop* o *fit* se decide
+3. **Aplicar.** Imágenes y gif por `awww` (levanta `awww-daemon` si no responde, transición
+   al azar; los gif los anima él solo), videos por `mpvpaper` (matando el anterior **y
+   apagando la capa de `awww` con `awww clear`**: no se va sola, se queda debajo con el
+   último fondo, y por las barras de un video más panorámico que la pantalla se seguía
+   viendo la imagen anterior). Los gif cuentan como imagen: salen en `Todos` y en su
+   carpeta, pero no en el chip `Video`. El *crop* o *fit* se decide
    comparando la relación de aspecto de la imagen con la del monitor donde está abierto el
    picker: si la imagen es más "angosta" que la pantalla se recorta, si es más ancha entra
    completa con barras.
 4. **Post-command.** Después de aplicar el fondo corre el script de
-   `WallpaperConfig.postCommand` con `$WALLPAPER`, `$WALL_NAME` y `$CACHE_DIR` exportadas.
-   Es el gancho para los colores (ver abajo).
-5. La ruta del fondo actual queda en `~/.cache/quickshell-wallpaper/current` — de ahí la
-   lee el launcher de Rofi para usarla de fondo.
+   `WallpaperConfig.postCommand` con `$WALLPAPER`, `$WALL_NAME`, `$WALL_THUMB` y
+   `$CACHE_DIR` exportadas. Es el gancho para los colores (ver abajo).
+5. **El fondo actual, para los de afuera.** La ruta del archivo queda en texto plano en
+   `~/.cache/quickshell-wallpaper/current`, y al lado queda `current_symlink`, una ruta
+   fija que apunta a la **miniatura** del fondo, no al original: así es siempre un JPEG y
+   lo que solo sabe abrir imágenes (hyprlock, Rofi, `ucs`) funciona igual cuando el fondo
+   es un mp4 o un gif. Es la misma miniatura que dibuja el carrusel, así que normalmente
+   ya está hecha; si falta, se genera al aplicar. Si ni así se puede (archivo que
+   ffmpeg/magick no digieren), el symlink cae al original antes que quedar roto.
 
-**Todo lo configurable está en `wallpaper/WallpaperConfig.qml`**: carpeta, extensiones,
-si se listan videos, alto y paralelismo de las miniaturas, transiciones de awww, opciones
-de mpvpaper, modo de encaje y el post-command.
+**Todo lo configurable está en `wallpaper/WallpaperConfig.qml`**: carpeta, extensiones
+(imágenes, gif y videos por separado), si se listan videos, alto y paralelismo de las
+miniaturas, transiciones de awww, opciones de mpvpaper, modo de encaje y el post-command.
 
 ### Colores dinámicos (ucs)
 
 El post-command del picker es:
 
 ```bash
-ucs automatic --from-image "$WALLPAPER" --mode shading --colors 7
+ucs automatic --from-image "$WALL_THUMB" --mode shading --colors 7
 ```
+
+Va `$WALL_THUMB` (la miniatura cacheada) y no `$WALLPAPER` a propósito: siempre es un
+JPEG, así que la paleta sale igual de un mp4 o un gif. Con el original, `ucs` fallaba en
+silencio y te quedabas con los colores del fondo anterior.
 
 `ucs` saca una paleta de 7 colores del wallpaper y reescribe los archivos listados en
 `~/.config/ucs/config.json`:
@@ -375,9 +388,14 @@ Scripts en `waybar/scripts/`:
 
 ### Rofi
 
-`launcher.sh` lee el wallpaper actual del picker, lo recorta a la proporción del panel
-lateral con ImageMagick (cacheado en `/tmp`, solo se rehace si cambió el fondo) y se lo
-pasa a Rofi por `-theme-str`. Resultado: el launcher siempre muestra el fondo del momento.
+`launcher.sh` lee el wallpaper actual por `current_symlink` (o sea la miniatura, que
+siempre es un JPEG: con videos y gif funciona igual), lo recorta a la proporción del panel
+lateral con ImageMagick y se lo pasa a Rofi por `-theme-str`. Resultado: el launcher
+siempre muestra el fondo del momento.
+
+El crop se cachea en `/tmp` y solo se rehace si cambió el fondo, pero lo que se compara es
+**a dónde apunta** el symlink, no su ruta: la ruta es fija y nunca cambia, así que
+comparándola el crop se generaba una vez y se quedaba congelado para siempre.
 
 ### Tema de SDDM
 
