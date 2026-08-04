@@ -103,10 +103,22 @@ PanelWindow {
     // ======================================================================
     ListModel { id: entries }
 
+    // Lo que se lista. Una sola fuente para el scan y para thumbs.sh: si los
+    // dos no miran las mismas extensiones, lo que solo ve el scan aparece como
+    // tarjeta que nunca recibe miniatura.
+    //
+    // El chip "Video" de la barra NO entra aqui: filtra lo que se ve, no lo que
+    // se escanea. El modelo siempre tiene todo (por eso al activarlo las
+    // tarjetas de video ya estan listas, sin volver a escanear ni regenerar).
+    function extensionesActivas() {
+        const base = WallpaperConfig.imageExtensions.concat(WallpaperConfig.gifExtensions)
+        return WallpaperConfig.enableVideo
+            ? base.concat(WallpaperConfig.videoExtensions)
+            : base
+    }
+
     function scanScript() {
-        const exts = WallpaperConfig.enableVideo
-            ? WallpaperConfig.imageExtensions.concat(WallpaperConfig.videoExtensions)
-            : WallpaperConfig.imageExtensions
+        const exts = root.extensionesActivas()
 
         const expr = []
         for (let i = 0; i < exts.length; i++) expr.push(`-iname '*.${exts[i]}'`)
@@ -289,9 +301,7 @@ PanelWindow {
         // false), que es el unico caso en que hay que generar algo.
         if (!root.faltanThumbs()) return
 
-        const exts = WallpaperConfig.enableVideo
-            ? WallpaperConfig.imageExtensions.concat(WallpaperConfig.videoExtensions)
-            : WallpaperConfig.imageExtensions
+        const exts = root.extensionesActivas()
 
         // currentWallpaper le dice desde donde recorrer: el script reporta las
         // miniaturas abriendose desde ahi hacia los dos lados, asi las tarjetas
@@ -393,6 +403,11 @@ PanelWindow {
 
     // ======================================================================
     //  6. FILTRADO  (por carpeta, por tipo y por nombre)
+    //
+    //  Todos los chips son lo mismo: escriben currentFilter y el carrusel
+    //  muestra lo que coincida. "Video" es uno mas, solo que en vez de mirar
+    //  la carpeta mira el tipo. Los gif cuentan como imagen, asi que salen en
+    //  "Todos" y en su carpeta, pero no en "Video".
     // ======================================================================
     function itemMatches(name, carpeta, isVideo, filter, query) {
         if (query !== "" && String(name).toLowerCase().indexOf(query.toLowerCase()) === -1)
@@ -431,6 +446,12 @@ PanelWindow {
     //  El wallpaper aplicado se guarda en cacheDir/current (lo escribe el
     //  script de applyWallpaper). Al abrir se lee de ahi para que la vista
     //  arranque centrada en el fondo actual y no en el primero de la lista.
+    //
+    //  El mismo script deja al lado un symlink (cacheDir/currentLinkName) a la
+    //  MINIATURA del fondo, no al original: asi es siempre un JPEG y lo de
+    //  afuera que solo sabe abrir imagenes -hyprlock, extractores de paleta-
+    //  funciona igual con un mp4 o un gif. El picker no lo usa: lee `current`,
+    //  que es texto plano y guarda la ruta del archivo de verdad.
     // ======================================================================
     property string currentWallpaper: ""
     property bool   currentRead: false   // ya sabemos (o ya sabemos que no sabemos)
@@ -563,8 +584,11 @@ PanelWindow {
         root.isApplying = true
         applyUnlock.restart()
 
-        const file = root.bashEscape(filePath)
-        const name = root.bashEscape(fileName)
+        const file  = root.bashEscape(filePath)
+        const name  = root.bashEscape(fileName)
+        // La miniatura que ya dibuja el carrusel: a esa apunta el symlink.
+        const thumb = root.bashEscape(root.thumbPath(filePath))
+        const genThumb = root.bashEscape(root.scriptPath("thumbs.sh"))
         const tr = WallpaperConfig.transitions[
             Math.floor(Math.random() * WallpaperConfig.transitions.length)]
 
@@ -585,8 +609,21 @@ PanelWindow {
                fi`
             : `RESIZE=${WallpaperConfig.resizeMode}`
 
+        // La capa de awww con la imagen estatica NO se va sola: se queda ahi
+        // abajo con el ultimo fondo puesto para siempre. mpvpaper dibuja encima
+        // y por eso normalmente no se nota, pero en cuanto el video no tapa
+        // hasta el ultimo pixel -uno mas panoramico que la pantalla entra con
+        // barras arriba y abajo- por esas barras se seguia viendo el wallpaper
+        // anterior. Se apaga antes de arrancar el video; asi lo que hay debajo
+        // es negro y no la foto de antes.
+        //
+        // Es la contraparte del `pkill mpvpaper` de las imagenes, que hasta
+        // ahora no existia: se limpiaba en un sentido pero no en el otro.
+        // `clear` no mata el demonio, solo lo pinta de negro, asi que volver a
+        // una imagen sigue siendo instantaneo (no hay que relevantarlo).
         const setCmd = isVideo
-            ? `mpvpaper -o "${WallpaperConfig.mpvpaperOptions}" '*' "$WALLPAPER" >/dev/null 2>&1 &`
+            ? `awww query >/dev/null 2>&1 && awww clear 000000 >/dev/null 2>&1 || true
+               mpvpaper -o "${WallpaperConfig.mpvpaperOptions}" '*' "$WALLPAPER" >/dev/null 2>&1 &`
             : `${resizeCmd}
                awww query >/dev/null 2>&1 || { awww-daemon >/dev/null 2>&1 & sleep 0.6; }
                awww img "$WALLPAPER" --resize "$RESIZE" --transition-type ${tr} --transition-pos 0.5,0.5 --transition-fps ${WallpaperConfig.transitionFps} --transition-duration ${WallpaperConfig.transitionDuration}`
@@ -598,12 +635,16 @@ PanelWindow {
         const script = `
             export WALLPAPER="${file}"
             export WALL_NAME="${name}"
+            export WALL_THUMB="${thumb}"
             export CACHE_DIR="${WallpaperConfig.cacheDir}"
+            export CURRENT_LINK="$CACHE_DIR/${WallpaperConfig.currentLinkName}"
 
             # Alias en minuscula: waypaper llama a su variable "$wallpaper", y
             # asi un post_command copiado de ahi funciona sin editarlo.
             export wallpaper="$WALLPAPER"
             export wall_name="$WALL_NAME"
+            export wall_thumb="$WALL_THUMB"
+            export current_link="$CURRENT_LINK"
 
             mkdir -p "$CACHE_DIR"
             printf '%s' "$WALLPAPER" > "$CACHE_DIR/current"
@@ -611,6 +652,31 @@ PanelWindow {
             pkill mpvpaper 2>/dev/null || true
 
             ${setCmd}
+
+            # Ademas de la ruta en texto, un symlink en una ruta FIJA, para lo
+            # de afuera (hyprlock, Rofi, scripts). Apunta a la miniatura y no al
+            # original: es la misma que dibuja el carrusel y siempre es un JPEG,
+            # asi que un mp4 o un gif -que hyprlock no abre- se ven igual.
+            #
+            # Normalmente ya existe (el picker la genero para pintar la tarjeta
+            # desde la que acabas de elegir); se genera aqui solo si falta o si
+            # quedo mas vieja que el archivo.
+            #
+            # Va DESPUES de aplicar el fondo a proposito: generar una miniatura
+            # que falte cuesta un ffmpeg, y poniendolo antes ese segundo se lo
+            # comia el cambio de wallpaper -o sea que te quedabas mirando el
+            # fondo anterior-. Lo que se ve va primero; esto es contabilidad.
+            [ -s "$WALL_THUMB" ] && [ "$WALL_THUMB" -nt "$WALLPAPER" ] || bash "${genThumb}" --one ${WallpaperConfig.thumbHeight} "$WALLPAPER" "$WALL_THUMB" >/dev/null 2>&1
+
+            # Si aun asi no salio (ffmpeg/magick que no pudieron con el
+            # archivo), mejor el original que un symlink roto.
+            # -f pisa el link viejo, -n evita que si el destino anterior era un
+            # directorio se cree el link ADENTRO de el.
+            if [ -s "$WALL_THUMB" ]; then
+                ln -sfn "$WALL_THUMB" "$CURRENT_LINK"
+            else
+                ln -sfn "$WALLPAPER" "$CURRENT_LINK"
+            fi
 
             # ---------------- POST-COMMAND (WallpaperConfig.qml) ----------------
             ${WallpaperConfig.postCommand}

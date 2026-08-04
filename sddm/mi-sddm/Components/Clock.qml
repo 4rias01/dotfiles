@@ -12,12 +12,14 @@ Column {
     id: clock
 
     // ── Parametros (los setea quien use <Clock ... />) ──
+    // Los tamanos llegan en PIXELES ya escalados por Main.qml. Ver la nota
+    // sobre pixelSize vs pointSize al pie de este archivo.
     property color textColor: "#ffffff"
     property string fontFamily: "Sans"
     property string hourFormat: "HH:mm"
     property string dateFormat: "dddd d MMMM"
-    property int timeSize: 56
-    property int dateSize: 15
+    property int timeSize: 75
+    property int dateSize: 20
 
     // ── Estado interno ──
     // Los dos Text de abajo estan BINDEADOS a esta propiedad: cuando el
@@ -40,7 +42,7 @@ Column {
         text: Qt.formatDateTime(clock.now, clock.hourFormat)
         color: clock.textColor
         font.family: clock.fontFamily
-        font.pointSize: clock.timeSize
+        font.pixelSize: clock.timeSize
         font.bold: true
     }
 
@@ -49,7 +51,17 @@ Column {
         text: Qt.formatDateTime(clock.now, clock.dateFormat)
         color: clock.textColor
         font.family: clock.fontFamily
-        font.pointSize: clock.dateSize
+        font.pixelSize: clock.dateSize
         font.bold: true
     }
 }
+
+// ── pixelSize y no pointSize ────────────────────────────────────
+// Un "point" es una medida FISICA: Qt lo convierte a pixeles usando los
+// DPI que reporta la pantalla. Como el tema ya escala sus medidas contra
+// la resolucion, usar pointSize haria que el DPI se cuente dos veces y el
+// texto saldria desproporcionado en un panel denso (un 1080p de 15" tiene
+// ~40% mas DPI que un 1366x768 del mismo tamano).
+//
+// Con pixelSize el tamano depende de una sola cosa: el factor de escala.
+

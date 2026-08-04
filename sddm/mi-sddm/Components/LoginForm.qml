@@ -9,10 +9,15 @@ import QtQuick.Controls
 Column {
     id: form
 
+    // Factor de escala global. Las medidas propias de este componente
+    // (separaciones, alturas de linea) estan escritas en pixeles de
+    // diseno y se multiplican por el aca adentro.
+    property real uiScale: 1.0
+
     property string fontFamily: "Sans"
     property string iconFont: "Sans"
-    property int textSize: 10
-    property int iconSize: 12
+    property int textSize: 13
+    property int iconSize: 16
     property int fieldHeight: 42
     property color fieldColor: "#2a2d3a"
     property color fieldTextColor: "#ffffff"
@@ -27,7 +32,15 @@ Column {
     // Se usa una propiedad intermedia y el Text elige que mostrar.
     property string message: ""
 
-    spacing: 10
+    // Texto secundario (aviso y selector de sesion): 90% del principal.
+    // Antes era "textSize - 1"; con pointSize ese -1 era un escalon real,
+    // con pixelSize escalado seria invisible en pantallas grandes.
+    readonly property int smallTextSize: Math.max(1, Math.round(textSize * 0.9))
+
+    // Pixel de diseno → pixel real.
+    function dp(v) { return Math.round(v * form.uiScale) }
+
+    spacing: dp(10)
 
     function doLogin() {
         form.message = ""
@@ -77,7 +90,7 @@ Column {
         KeyNavigation.tab: username
     }
 
-    Item { width: 1; height: 12 }
+    Item { width: 1; height: form.dp(12) }
 
     Button {
         id: loginButton
@@ -99,7 +112,7 @@ Column {
             text: "Login"
             color: form.buttonTextColor
             font.family: form.fontFamily
-            font.pointSize: form.textSize
+            font.pixelSize: form.textSize
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -109,11 +122,11 @@ Column {
     Text {
         id: warning
         width: parent.width
-        height: 18
+        height: Math.round(form.smallTextSize * 1.5)
         horizontalAlignment: Text.AlignHCenter
         color: form.warningColor
         font.family: form.fontFamily
-        font.pointSize: form.textSize - 1
+        font.pixelSize: form.smallTextSize
         text: form.message !== ""
               ? form.message
               : (keyboard.capsLock ? "Bloq Mayus activado" : "")
@@ -126,7 +139,7 @@ Column {
     ComboBox {
         id: session
         width: parent.width
-        height: 24
+        height: Math.round(form.smallTextSize * 2)
         model: sessionModel
         textRole: "name"
         currentIndex: sessionModel.lastIndex
@@ -138,7 +151,7 @@ Column {
             text: "Session (" + session.displayText + ")"
             color: session.hovered ? form.accentColor : form.buttonTextColor
             font.family: form.fontFamily
-            font.pointSize: form.textSize - 1
+            font.pixelSize: form.smallTextSize
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
