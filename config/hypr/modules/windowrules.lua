@@ -56,6 +56,7 @@ hl.window_rule({ match = { class = "obsidian" },                          opacit
 hl.window_rule({ match = { class = "drracket" },                          opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "org.kde.okular" },                    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "com.github.xournalpp.xournalpp" },    opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "org.consequences.ColorSwitcher" },    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "waypaper" },                          opacity = "0.9 override 0.9 override" })
 hl.window_rule({ match = { class = "zoom" },                              opacity = "0.9 override 0.9 override" })
 

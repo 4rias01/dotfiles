@@ -16,18 +16,26 @@ import QtQuick
 Item {
     id: bar
 
+    // Factor de escala global, para las medidas propias del componente.
+    property real uiScale: 1.0
+
     property color iconColor: "#f8f8f2"
     property color hoverColor: "#b7cef1"
     property string fontFamily: "Sans"
     property string iconFont: "Sans"
-    property int iconSize: 16
-    property int labelSize: 9
+    property int iconSize: 21
+    property int labelSize: 12
 
     // sddm.canPowerOff y compania son false en --test-mode, asi que sin
     // esto los botones no aparecen mientras desarrollas.
     property bool forceVisible: false
 
-    implicitHeight: 54
+    function dp(v) { return Math.round(v * bar.uiScale) }
+
+    // La altura sale del contenido en vez de ser un numero fijo: asi
+    // acompana sola a iconSize/labelSize y a la escala de la pantalla.
+    // (anchors.centerIn solo posiciona, no dimensiona: no hay loop.)
+    implicitHeight: row.implicitHeight
     height: implicitHeight
 
     function trigger(i) {
@@ -42,8 +50,9 @@ Item {
     }
 
     Row {
+        id: row
         anchors.centerIn: parent
-        spacing: 14
+        spacing: bar.dp(14)
 
         Repeater {
             // Un array de JS sirve perfectamente como model. Dentro del
@@ -57,8 +66,11 @@ Item {
             ]
 
             delegate: Item {
-                width: 66
-                height: 50
+                // La caja se ajusta al contenido mas un margen. Antes era
+                // 66x50 fijo, medido a ojo para el tamano de fuente de
+                // 1366x768: con otra escala el label se salia o sobraba aire.
+                width: content.implicitWidth + bar.dp(8)
+                height: content.implicitHeight + bar.dp(6)
                 visible: bar.forceVisible || modelData.ok
 
                 // El MouseArea cubre toda la caja, no solo el icono:
@@ -72,15 +84,16 @@ Item {
                 }
 
                 Column {
+                    id: content
                     anchors.centerIn: parent
-                    spacing: 5
+                    spacing: bar.dp(5)
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: modelData.glyph
                         color: hit.containsMouse ? bar.hoverColor : bar.iconColor
                         font.family: bar.iconFont
-                        font.pointSize: bar.iconSize
+                        font.pixelSize: bar.iconSize
                         Behavior on color { ColorAnimation { duration: 120 } }
                     }
 
@@ -89,7 +102,7 @@ Item {
                         text: modelData.label
                         color: hit.containsMouse ? bar.hoverColor : bar.iconColor
                         font.family: bar.fontFamily
-                        font.pointSize: bar.labelSize
+                        font.pixelSize: bar.labelSize
                         Behavior on color { ColorAnimation { duration: 120 } }
                     }
                 }

@@ -400,16 +400,38 @@ comparándola el crop se generaba una vez y se quedaba congelado para siempre.
 ### Tema de SDDM
 
 `sddm/mi-sddm/` — tema QML propio: reloj + formulario a un lado, con blur parcial en una
-banda del fondo. Ajustado a 1366×768.
+banda del fondo.
 
 Todo se toca desde **`theme.conf`** sin abrir QML: posición y ancho del formulario, blur
 (radio, ancho, alto, redondeo, suavidad del borde), tamaños de fuente e iconos, formato de
 hora y fecha, y la paleta completa.
 
-⚠️ Dos trampas que están documentadas en los archivos: **todo lo de `theme.conf` llega a
-QML como string** (de ahí los `parseInt()`/`parseFloat()`), y los colores **necesitan
-comillas** o el `#` se lee como comentario. Las fuentes tienen que estar en
+**Independiente de la resolución.** Las medidas están escritas contra una resolución de
+referencia (`designWidth`/`designHeight`, 1366×768) y `Main.qml` las multiplica por
+
+```
+escala = min(anchoReal / designWidth, altoReal / designHeight)
+```
+
+antes de usarlas, así que la misma config se ve igual en 1366×768, en 1080p y en 4K sin
+tocar un número. Se usa el mínimo de las dos razones: con la misma relación de aspecto da
+proporción exacta, y con una distinta manda el eje más ajustado, así el formulario nunca se
+sale de pantalla. `uiScale` es un multiplicador extra por gusto. En multimonitor no hay
+nada que hacer: SDDM instancia el tema una vez por pantalla y cada una calcula su escala.
+
+Las medidas que conceptualmente son *una porción de la pantalla* (`formPadding`,
+`blurWidth`, `blurHeight`) aceptan además porcentaje: `blurHeight="120%"` garantiza que la
+banda llegue de borde a borde en cualquier relación de aspecto.
+
+⚠️ Tres trampas que están documentadas en los archivos: **todo lo de `theme.conf` llega a
+QML como string** (de ahí los `parseInt()`/`parseFloat()`); los colores **necesitan
+comillas** o el `#` se lee como comentario; y las fuentes van en **píxeles, no en puntos**
+(un punto es una medida física que Qt convierte usando los DPI de la pantalla, y como el
+tema ya escala por su cuenta el DPI se contaría dos veces). Las fuentes tienen que estar en
 `/usr/share/fonts`, porque el usuario `sddm` no lee tu `$HOME`.
+
+Para depurar el QML: Qt manda `console.log` y los warnings al journal, no a la terminal.
+Con `QT_FORCE_STDERR_LOGGING=1` los ves donde esperás.
 
 ---
 

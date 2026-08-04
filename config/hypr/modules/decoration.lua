@@ -14,7 +14,7 @@ hl.config({
 
         -- https://wiki.hypr.land/Configuring/Basics/Variables/#variable-types for info about colors
         col = {
-            active_border   = "rgba(1e39ebee)",
+            active_border   = "rgba(6d5033ee)",
             inactive_border = "rgba(595959aa)",
         },
 

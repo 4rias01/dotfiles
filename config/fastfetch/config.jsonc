@@ -14,9 +14,9 @@
   "display": {
     "separator": "➜   ",
     "color": {
-      "separator": "#79a4c2",
-      "keys": "#79a4c2",
-      "title": "#79a4c2"
+      "separator": "#6d5033",
+      "keys": "#6d5033",
+      "title": "#6d5033"
     }
   },
   "modules": [
@@ -28,86 +28,86 @@
     "break",
     {
       "type": "custom",
-      "format": "{#red}┌───────────────────────────────────────────────────────┐" // `\u001b` is `\033`, or `\e`
+      "format": "{#white}┌───────────────────────────────────────────────────────┐" // `\u001b` is `\033`, or `\e`
     },
     "break",
     {
       "key": "     OS         ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "os"
     },
     /*{
       "key": "    󰌢 Machine    ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "host"
     },
     {
       "key": "     Kernel     ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "kernel"
     },*/
     {
       "key": "    󰅐 Uptime     ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "uptime"
     },
     {
       "key": "     Packages   ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "packages"
     },
     {
       "key": "     WM         ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "wm"
     },
     {
       "key": "     Shell      ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "shell"
     },
     {
       "key": "     Terminal   ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "terminal"
     },
     {
       "key": "     Font       ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "terminalfont"
     },
     {
       "key": "    󰻠 CPU        ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "cpu",
       "format": "{name:-30}" 
     },
     {
       "key": "    󰍛 GPU        ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "gpu",
       "format": "{vendor} {name}"
     },
     /*{
       "key": "    󰑭 Memory     ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "memory"
     },
     {
       "key": "     Wifi       ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "wifi"
     },
     {
       "key": "    󰩟 Local IP   ",
-      "keyColor": "#79a4c2",
+      "keyColor": "#6d5033",
       "type": "localip",
       "compact": true
     },*/
     "break",
     {
       "type": "custom",
-      "format": "{#red}└───────────────────────────────────────────────────────┘" // `\u001b` is `\033`, or `\e`
+      "format": "{#white}└───────────────────────────────────────────────────────┘" // `\u001b` is `\033`, or `\e`
     },
     "break"
     /*{

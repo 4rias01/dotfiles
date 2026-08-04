@@ -25,6 +25,56 @@ Item {
     width: 1920
     height: 1080
 
+    // ══ 0. Escala ═══════════════════════════════════════════════
+    // El tema se diseno UNA sola vez contra designWidth x designHeight.
+    // Todas las medidas de theme.conf estan en "pixeles de diseno" y se
+    // multiplican por uiScale antes de usarse, asi la misma config se ve
+    // igual en 1366x768, en 1080p y en 4K sin tocar un numero.
+    //
+    // Se usa min() de las dos razones (escalado "fit"): con la misma
+    // relacion de aspecto da proporcion exacta, y con una distinta manda
+    // el eje mas ajustado, asi el formulario nunca se sale de pantalla.
+    //
+    // Ojo: width/height estan en pixeles LOGICOS. Si Qt ya esta aplicando
+    // su propio factor HiDPI, este se multiplica encima sin duplicarlo.
+    //
+    // SDDM instancia el tema una vez POR PANTALLA, asi que en multimonitor
+    // cada una calcula su propia escala sola.
+    readonly property real designWidth: num(config.designWidth, 1366)
+    readonly property real designHeight: num(config.designHeight, 768)
+
+    readonly property real uiScale: Math.min(width / designWidth,
+                                             height / designHeight)
+                                    * num(config.uiScale, 1)
+
+    // config.x llega siempre como string, y una clave ausente llega como
+    // undefined. num() tapa los dos casos: nunca devuelve NaN.
+    function num(v, fallback) {
+        var n = parseFloat(v)
+        return isNaN(n) ? fallback : n
+    }
+
+    // Pixel de diseno → pixel real de esta pantalla.
+    function dp(v, fallback) {
+        return Math.round(num(v, fallback) * root.uiScale)
+    }
+
+    // Igual que dp(), pero ademas acepta porcentajes: "48%" se resuelve
+    // como fraccion de `basis` (el ancho o el alto de la pantalla). Es
+    // para las medidas que conceptualmente son "una porcion de pantalla"
+    // y no un tamano fijo.
+    function span(v, basis, fallback) {
+        if (typeof v === "string" && v.indexOf("%") !== -1)
+            return Math.round(basis * num(v, 0) / 100)
+        return dp(v, fallback)
+    }
+
+    // FastBlur clampea su radio a 64: mas alla de ahi el numero se ignora.
+    // Por eso el radio no puede escalar sin techo como el resto.
+    function blurPx(v, fallback) {
+        return Math.min(64, dp(v, fallback))
+    }
+
     // ── Tokens ──────────────────────────────────────────────────
     // Leidos una sola vez del config. Centralizarlos aca evita
     // repetir config.xxx en cada componente.
@@ -41,8 +91,8 @@ Item {
     readonly property color cIcon: config.iconColor
     readonly property color cWarning: config.warningColor
 
-    readonly property int formWidth: parseInt(config.formWidth)
-    readonly property int formPadding: parseInt(config.formPadding)
+    readonly property int formWidth: dp(config.formWidth, 340)
+    readonly property int formPadding: span(config.formPadding, width, 160)
 
     // ══ 1. Wallpaper ════════════════════════════════════════════
     Image {
@@ -57,7 +107,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         color: "black"
-        opacity: parseFloat(config.dimBackground)
+        opacity: root.num(config.dimBackground, 0.15)
     }
 
     // ══ 2. Zona del formulario ══════════════════════════════════
@@ -107,7 +157,7 @@ Item {
             id: blurred
             anchors.fill: parent
             source: blurSource
-            radius: parseInt(config.blurRadius)
+            radius: root.blurPx(config.blurRadius, 56)
             visible: false
         }
 
@@ -128,7 +178,7 @@ Item {
             Rectangle {
                 id: maskRect
                 color: "white"
-                radius: parseInt(config.blurCorner)
+                radius: root.dp(config.blurCorner, 0)
 
                 // "Sangrado": cuanto sobresale el rectangulo por fuera de
                 // la pantalla. Si el desvanecido ocurre en zona no visible,
@@ -136,11 +186,11 @@ Item {
                 // x3 porque FastBlur difumina hacia ambos lados del borde.
                 readonly property int bleed: (config.blurFlush === "true"
                                               && config.formPosition !== "center")
-                                             ? parseInt(config.blurEdgeSoftness) * 3
+                                             ? root.blurPx(config.blurEdgeSoftness, 48) * 3
                                              : 0
 
-                width: parseInt(config.blurWidth) + bleed
-                height: parseInt(config.blurHeight)
+                width: root.span(config.blurWidth, root.width, 660) + bleed
+                height: root.span(config.blurHeight, root.height, 900)
 
                 // Si blurHeight > alto de pantalla, y queda negativo y la
                 // banda se sale por arriba y abajo: borde a borde.
@@ -166,7 +216,7 @@ Item {
             id: softMask
             anchors.fill: parent
             source: maskShape
-            radius: parseInt(config.blurEdgeSoftness)
+            radius: root.blurPx(config.blurEdgeSoftness, 48)
             visible: false
         }
 
@@ -193,14 +243,15 @@ Item {
             fontFamily: root.uiFont
             hourFormat: config.hourFormat
             dateFormat: config.dateFormat
-            timeSize: parseInt(config.clockSize)
-            dateSize: parseInt(config.dateSize)
+            timeSize: root.dp(config.clockSize, 75)
+            dateSize: root.dp(config.dateSize, 20)
         }
 
-        Item { width: 1; height: parseInt(config.gapClockForm) }
+        Item { width: 1; height: root.dp(config.gapClockForm, 80) }
 
         LoginForm {
             width: parent.width
+            uiScale: root.uiScale
             fontFamily: root.uiFont
             iconFont: root.iconFont
             fieldColor: root.cField
@@ -210,21 +261,22 @@ Item {
             buttonTextColor: root.cButtonText
             warningColor: root.cWarning
             accentColor: root.cAccent
-            textSize: parseInt(config.fontSize)
-            iconSize: parseInt(config.fieldIconSize)
-            fieldHeight: parseInt(config.fieldHeight)
+            textSize: root.dp(config.fontSize, 13)
+            iconSize: root.dp(config.fieldIconSize, 16)
+            fieldHeight: root.dp(config.fieldHeight, 42)
         }
 
-        Item { width: 1; height: parseInt(config.gapFormSystem) }
+        Item { width: 1; height: root.dp(config.gapFormSystem, 56) }
 
         SystemButtons {
             width: parent.width
+            uiScale: root.uiScale
             iconColor: root.cIcon
             hoverColor: root.cAccent
             fontFamily: root.uiFont
             iconFont: root.iconFont
-            iconSize: parseInt(config.sysIconSize)
-            labelSize: parseInt(config.sysLabelSize)
+            iconSize: root.dp(config.sysIconSize, 21)
+            labelSize: root.dp(config.sysLabelSize, 12)
             forceVisible: config.forceSystemButtons === "true"
         }
     }

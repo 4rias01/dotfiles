@@ -8,8 +8,8 @@ Singleton {
 
     // Superficie
     property color velo:            "#cc11111b"     // RECTANGULO OVERLAY
-    property color colorBoton:      "#002c3f"       // Color del boton normal
-    property color colorBotonHover: "#22516c"       // Color del boton en hover
+    property color colorBoton:      "#331d00"       // Color del boton normal
+    property color colorBotonHover: "#452b11"       // Color del boton en hover
     property color colorBorde:      "#313244"       // Color del borde normal
     property color colorBordeHover: "#89b4fa"       // Color del borde en hover
 
