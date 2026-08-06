@@ -8,3 +8,4 @@ config/hypr/modules/decoration.lua
 config/quickshell/mishell/config/Theme.qml
 config/starship.toml
 config/waybar/style.css
+config/quickshell/othershell/
