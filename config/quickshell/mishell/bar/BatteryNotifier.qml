@@ -7,6 +7,12 @@
 //  igual. Se manda por notify-send (swaync lo muestra) con un id sincrono,
 //  asi el aviso del 10% reemplaza al del 20% en vez de apilarse.
 //
+//  La memoria de "ya avise este umbral" vive en PersistentProperties: es lo
+//  unico que sobrevive a una recarga del shell (cada guardado de config y
+//  cada corrida de ucs recargan). Sin esto, cada recarga volvia a crear este
+//  objeto con la memoria vacia y repetia el aviso del umbral vigente, lo que
+//  parecia "una notificacion por cada punto de bateria".
+//
 //  Para probar sin descargar la laptop:
 //      qs ipc -c mishell call bar probarBateria 10
 // ---------------------------------------------------------------------------
@@ -26,7 +32,11 @@ Item {
                                      && dev.state !== UPowerDeviceState.FullyCharged
                                      && dev.state !== UPowerDeviceState.PendingCharge
 
-    property var avisados: ({})
+    PersistentProperties {
+        id: memoria
+        reloadableId: "bateriaAvisos"
+        property var avisados: ({})
+    }
 
     onPctChanged: revisar()
     onDescargandoChanged: revisar()
@@ -34,20 +44,20 @@ Item {
 
     function revisar(): void {
         if (!root.descargando) {
-            root.avisados = {}
+            if (Object.keys(memoria.avisados).length) memoria.avisados = {}
             return
         }
         // el umbral mas bajo que ya cruzamos
         const umbrales = BarConfig.umbralesNotificacion.slice().sort((a, b) => b - a)
         let objetivo = -1
         for (const u of umbrales) if (root.pct <= u) objetivo = u
-        if (objetivo < 0 || root.avisados[objetivo]) return
+        if (objetivo < 0 || memoria.avisados[objetivo]) return
 
         // marcar este y todos los de arriba (si saltamos de 25 a 8, el 20 y
         // el 10 no tienen que sonar despues)
-        const nuevo = Object.assign({}, root.avisados)
+        const nuevo = Object.assign({}, memoria.avisados)
         for (const u of umbrales) if (u >= objetivo) nuevo[u] = true
-        root.avisados = nuevo
+        memoria.avisados = nuevo
         root.notificar(objetivo, root.pct, root.dev.timeToEmpty)
     }
 

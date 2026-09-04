@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 //  Battery.qml  --  bateria (UPower) + perfil de energia como sufijo.
 //  Clic: popup con el switch ahorro / balanceado / rendimiento.
-//  Colores/parpadeo iguales a la Waybar: verde cargando, amarillo <= aviso,
-//  rojo <= critico.
+//  Colores: verde cargando, amarillo <= aviso, rojo <= critico. Parpadea solo
+//  desde BarConfig.bateriaParpadeo (5 %) y descargando.
 // ---------------------------------------------------------------------------
 import QtQuick
 import Quickshell.Services.UPower
@@ -50,7 +50,7 @@ Module {
          : root.pct <= BarConfig.bateriaCritico ? BarConfig.rojo
          : root.pct <= BarConfig.bateriaAviso   ? BarConfig.amarillo
          : BarConfig.texto
-    parpadeo: !root.enchufada && root.pct <= BarConfig.bateriaAviso
+    parpadeo: !root.enchufada && root.pct <= BarConfig.bateriaParpadeo
 
     activo: BarState.popupActivo("bateria", root.pantalla)
     tooltip: {

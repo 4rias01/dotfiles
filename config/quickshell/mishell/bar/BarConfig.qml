@@ -39,10 +39,10 @@ Singleton {
     // a ~4 px del pill.
     property int recorteZona:        s(8)
     property int margenLateral:      s(10)    // aire a izquierda y derecha
-    property int separacionBurbujas: s(10)    // entre burbujas del mismo lado
+    property int separacionBurbujas: s(35)    // entre burbujas del mismo lado
     property int paddingBurbuja:     s(5)     // relleno interno de la burbuja
     property int paddingModulo:      s(7)     // relleno interno de cada modulo
-    property int separacionModulos:  s(2)     // entre modulos dentro de una burbuja
+    property int separacionModulos:  s(5)     // entre modulos dentro de una burbuja
     property int radio:              s(9)     // radio de la burbuja
     property int radioModulo:        s(7)     // radio del fondo de hover de un modulo
 
@@ -99,8 +99,9 @@ Singleton {
     property int anchoWorkspace: s(26)
 
     // --- Bateria -----------------------------------------------------------
-    property int bateriaAviso:   25   // amarillo + parpadeo
-    property int bateriaCritico: 10   // rojo + parpadeo
+    property int bateriaAviso:   25   // amarillo
+    property int bateriaCritico: 10   // rojo
+    property int bateriaParpadeo: 5   // desde aqui (y descargando) el modulo parpadea
     // Notificaciones tipo Windows. Se avisa UNA vez por umbral mientras se
     // descarga; al enchufar el cargador se reinician todos.
     property var umbralesNotificacion: [20, 10, 5, 1]

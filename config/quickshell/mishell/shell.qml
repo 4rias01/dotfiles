@@ -17,7 +17,7 @@ Scope {
     }
 
     LogoutOverlay {}
-    WallpaperPicker {}
+    WallpaperPicker { id: picker }
     Bar { id: barra }
 
     IpcHandler {
@@ -36,6 +36,10 @@ Scope {
         function toggle(): void { WallpaperState.alternar() }
         function open(): void { WallpaperState.abrir() }
         function close(): void { WallpaperState.cerrar() }
+        // moverse por el carrusel desde fuera (binds, pruebas): -1 / 1
+        function step(dir: int): void { picker.stepToValid(dir) }
+        function apply(): void { picker.applyCurrent() }
+        function filter(nombre: string): void { picker.currentFilter = nombre }
     }
 
     IpcHandler {
