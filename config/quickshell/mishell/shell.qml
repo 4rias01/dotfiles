@@ -1,9 +1,11 @@
 // ~/.config/quickshell/mishell/shell.qml
 import Quickshell
 import Quickshell.Io
+import Quickshell.Hyprland
 import QtQuick
 import qs.logout
 import qs.wallpaper
+import qs.bar
 
 Scope {
     Connections {
@@ -16,6 +18,7 @@ Scope {
 
     LogoutOverlay {}
     WallpaperPicker {}
+    Bar { id: barra }
 
     IpcHandler {
 
@@ -33,5 +36,24 @@ Scope {
         function toggle(): void { WallpaperState.alternar() }
         function open(): void { WallpaperState.abrir() }
         function close(): void { WallpaperState.cerrar() }
+    }
+
+    IpcHandler {
+
+        target: "bar"
+
+        // (open/close y no show/hide: `show` es un subcomando de `qs ipc`)
+        function toggle(): void { BarState.alternar() }
+        function open(): void { BarState.mostrar() }
+        function close(): void { BarState.ocultar() }
+        // lo mismo que el clic derecho en el reloj, pero desde un bind
+        function hora(): void { BarState.alternarHora() }
+        // abre/cierra un popup en el monitor enfocado: bateria | reloj | brillo | volumen
+        function popup(nombre: string): void {
+            const m = Hyprland.focusedMonitor
+            BarState.alternarPopup(nombre, m ? m.name : Quickshell.screens[0].name)
+        }
+        // simula el aviso de bateria baja: qs ipc -c mishell call bar probarBateria 10
+        function probarBateria(pct: int): void { barra.probarBateria(pct) }
     }
 }

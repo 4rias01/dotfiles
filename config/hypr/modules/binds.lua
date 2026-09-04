@@ -90,7 +90,7 @@ hl.bind(mainMod .. " + A",         hl.dsp.exec_cmd("grim - | wl-copy"))
 hl.bind(mainMod .. " + N",         hl.dsp.exec_cmd("swaync-client -t"))
 hl.bind(mainMod .. " + ESCAPE",    hl.dsp.exec_cmd("qs ipc -c mishell call logout toggle"))
 hl.bind(mainMod .. " + L",         hl.dsp.exec_cmd("hyprlock"))
-hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("~/.config/waybar/scripts/launch.sh"))
+hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("qs ipc -c mishell call bar toggle"))
 
 hl.bind(mainMod .. " + SPACE",          hl.dsp.window.fullscreen({ mode = "fullscreen" }))
 hl.bind(mainMod .. " + SHIFT + SPACE",  hl.dsp.window.fullscreen({ mode = "maximized" }))
