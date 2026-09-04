@@ -63,9 +63,13 @@ Item {
     transformOrigin: Item.Center
     readonly property real escalaObjetivo: mouse.pressed ? BarConfig.escalaClic
                                          : (root.hovered ? BarConfig.escalaHover : 1)
+    // Si somos el unico modulo de la burbuja, rebota ella (Bubble.solo) y
+    // nosotros nos quedamos quietos.
+    readonly property bool enBurbujaSola: parent && parent.parent
+                                       && parent.parent.solo === true
     onEscalaObjetivoChanged: {
         escalaAnim.stop()
-        escalaAnim.to = root.escalaObjetivo
+        escalaAnim.to = root.enBurbujaSola ? 1 : root.escalaObjetivo
         escalaAnim.start()
     }
     NumberAnimation {
@@ -79,8 +83,8 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        anchors.topMargin: 3
-        anchors.bottomMargin: 3
+        anchors.topMargin: BarConfig.s(3)
+        anchors.bottomMargin: BarConfig.s(3)
         radius: BarConfig.radioModulo
         color: BarConfig.hover
         opacity: (root.hovered || root.activo) ? 1 : 0
@@ -110,7 +114,7 @@ Item {
 
             Rectangle {
                 visible: root.punto
-                width: 6; height: 6; radius: 3
+                width: BarConfig.s(6); height: width; radius: width / 2
                 color: root.colorPunto
                 anchors.right: parent.right
                 anchors.top: parent.top

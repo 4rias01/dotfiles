@@ -359,8 +359,9 @@ miniaturas, transiciones de awww, opciones de mpvpaper, modo de encaje y el post
 
 `bar/` — reescritura de la Waybar en Quickshell, misma disposición y mismos módulos,
 con animaciones "burbuja" (todo lo que se mueve lo hace con `Easing.OutBack`: los
-módulos rebotan al pasar el mouse y se aplastan al hacer clic, las burbujas entran en
-cascada al arrancar, el indicador del workspace activo se desliza entre botones, los
+módulos rebotan al pasar el mouse y se aplastan al hacer clic —si la burbuja tiene un
+solo módulo, como el reloj o el reproductor, rebota la burbuja entera—, las burbujas
+entran en cascada al arrancar, el indicador del workspace activo se desliza entre botones, los
 popups crecen desde la barra). Referencias: [serpantinum](https://github.com/ilyamiro/serpantinum)
 para los acentos y [caelestia](https://github.com/caelestia-dots/shell) para el panel del reloj.
 
@@ -421,7 +422,8 @@ Spotify > el que suene > el primero), `Swaync` (`swaync-client -swb` en tail), `
 directo de los servicios de Quickshell (`UPower`, `PowerProfiles`, `Networking`,
 `Bluetooth`, `Pipewire`, `Hyprland`).
 
-**Todo lo configurable está en `bar/BarConfig.qml`**: geometría, fuente, paleta (fija, no
+**Todo lo configurable está en `bar/BarConfig.qml`**: `escala` (0.9 = la barra y su tooltip un
+10 % más chicos; los popups tienen tamaño fijo y no la siguen; las medidas en px pasan por `s()`), geometría, fuente, paleta (fija, no
 la toca `ucs`), duraciones y overshoot de las animaciones, workspaces persistentes por
 monitor, umbrales de batería, formatos del reloj, reproductor preferido, velocidad del
 marquee, pasos de brillo/volumen y todos los comandos.

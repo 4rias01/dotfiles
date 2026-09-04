@@ -31,12 +31,12 @@ PopupWindow {
 
     Rectangle {
         id: caja
-        implicitWidth: txt.implicitWidth + 20
-        implicitHeight: txt.implicitHeight + 12
+        implicitWidth: txt.implicitWidth + BarConfig.s(20)
+        implicitHeight: txt.implicitHeight + BarConfig.s(12)
         color: BarConfig.popupFondo
         border.width: 1
         border.color: BarConfig.popupBorde
-        radius: 8
+        radius: BarConfig.s(8)
         transformOrigin: Item.Top
         scale: root.mostrar ? 1 : 0.7
         Behavior on scale {

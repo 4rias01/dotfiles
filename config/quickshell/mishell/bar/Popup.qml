@@ -72,6 +72,7 @@ PopupWindow {
 
     Rectangle {
         id: caja
+        // los popups NO siguen a BarConfig.escala: se disenan a tamano fijo
         implicitWidth: cont.implicitWidth + 2 * root.padding
         implicitHeight: cont.implicitHeight + 2 * root.padding
         color: BarConfig.popupFondo
@@ -86,8 +87,10 @@ PopupWindow {
 
         Item {
             id: cont
-            anchors.fill: parent
-            anchors.margins: root.padding
+            x: root.padding
+            y: root.padding
+            width: childrenRect.width
+            height: childrenRect.height
             implicitWidth: childrenRect.width
             implicitHeight: childrenRect.height
         }

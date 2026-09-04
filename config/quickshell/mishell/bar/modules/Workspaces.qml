@@ -76,9 +76,9 @@ Item {
         id: indicador
         visible: root.indiceActivo >= 0
         x: fila.x + root.indiceActivo * root.paso
-        y: 3
+        y: BarConfig.s(3)
         width: BarConfig.anchoWorkspace
-        height: parent.height - 6
+        height: parent.height - 2 * y
         radius: BarConfig.radioModulo
         color: BarConfig.activoFondo
         Behavior on x {
@@ -111,8 +111,8 @@ Item {
 
                 Rectangle {
                     anchors.fill: parent
-                    anchors.topMargin: 3
-                    anchors.bottomMargin: 3
+                    anchors.topMargin: BarConfig.s(3)
+                    anchors.bottomMargin: BarConfig.s(3)
                     radius: BarConfig.radioModulo
                     color: BarConfig.hover
                     opacity: (m.containsMouse && !boton.activo) ? 1 : 0

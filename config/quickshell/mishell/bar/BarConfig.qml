@@ -21,22 +21,30 @@ Singleton {
     // arranca oculta (util si vuelves a poner Waybar en el autostart).
     property bool ocultarSiHayWaybar: false
 
+    // --- Escala global -----------------------------------------------------
+    // 1.0 = tamano de diseno. 0.9 = la barra (pill, fuentes, iconos, tooltip)
+    // un 10 % mas chica. Los POPUPS no la siguen: tienen tamano fijo. Las
+    // medidas de abajo ya la aplican via s(); si agregas una medida nueva en
+    // px de la barra, envuelvela igual.
+    property real escala: 0.9
+    function s(v: real): int { return Math.max(1, Math.round(v * escala)) }
+
     // --- Geometria ---------------------------------------------------------
-    property int alto:               30    // alto de cada burbuja (el "pill")
-    property int margenSuperior:     3     // aire entre el borde de la pantalla y la barra
-    property int margenInferior:     2     // no bajar de 0: el contenido (y el rebote del hover) se recorta
+    property int alto:               s(30)    // alto de cada burbuja (el "pill")
+    property int margenSuperior:     s(3)     // aire entre el borde de la pantalla y la barra
+    property int margenInferior:     s(2)     // no bajar de 0: el contenido (y el rebote del hover) se recorta
     // Cuanto se ACERCAN las ventanas a la barra: px que se restan a la zona
     // reservada, para que entren en el margen transparente. Hyprland suma
     // ademas sus gaps_out (10 en decoration.lua). Con 8, las ventanas quedan
     // a ~4 px del pill.
-    property int recorteZona:        8
-    property int margenLateral:      10    // aire a izquierda y derecha
-    property int separacionBurbujas: 10    // entre burbujas del mismo lado
-    property int paddingBurbuja:     5     // relleno interno de la burbuja
-    property int paddingModulo:      7     // relleno interno de cada modulo
-    property int separacionModulos:  2     // entre modulos dentro de una burbuja
-    property int radio:              9     // radio de la burbuja
-    property int radioModulo:        7     // radio del fondo de hover de un modulo
+    property int recorteZona:        s(8)
+    property int margenLateral:      s(10)    // aire a izquierda y derecha
+    property int separacionBurbujas: s(10)    // entre burbujas del mismo lado
+    property int paddingBurbuja:     s(5)     // relleno interno de la burbuja
+    property int paddingModulo:      s(7)     // relleno interno de cada modulo
+    property int separacionModulos:  s(2)     // entre modulos dentro de una burbuja
+    property int radio:              s(9)     // radio de la burbuja
+    property int radioModulo:        s(7)     // radio del fondo de hover de un modulo
 
     // --- Launcher ----------------------------------------------------------
     // CachyOS (nf-linux-cachyos). Para el de Arch: "\uf303".
@@ -44,8 +52,8 @@ Singleton {
 
     // --- Tipografia --------------------------------------------------------
     property string fuente:   "JetBrainsMono Nerd Font"
-    property int    tamFuente: 15
-    property int    tamIcono:  16
+    property int    tamFuente: s(15)
+    property int    tamIcono:  s(16)
 
     // --- Colores (fijos) ---------------------------------------------------
     property color fondo:        "#b3000008"   // rgba(0,0,8,.7), como la Waybar
@@ -88,7 +96,7 @@ Singleton {
     // los que esten en la tabla.
     property int workspacesPersistentes: 5
     property var workspacesPorMonitor: ({ "HDMI-A-1": 3 })
-    property int anchoWorkspace: 26
+    property int anchoWorkspace: s(26)
 
     // --- Bateria -----------------------------------------------------------
     property int bateriaAviso:   25   // amarillo + parpadeo
@@ -107,7 +115,7 @@ Singleton {
 
     // --- Media (Spotify) ---------------------------------------------------
     property string playerPreferido: "spotify"  // si no esta, el que este sonando
-    property int    mediaAnchoMax:   200        // px antes de empezar a desplazar
+    property int    mediaAnchoMax:   s(200)        // px antes de empezar a desplazar
     property real   mediaVelocidad:  28         // px por segundo del marquee
     property bool   mediaScrollSiempre: false   // true = desplaza aunque quepa
     property int    mediaPausaMs:    1500       // pausa al inicio de cada vuelta
