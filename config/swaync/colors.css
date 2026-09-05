@@ -1,0 +1,12 @@
+/* ---------------------------------------------------------------------------
+   swaync/colors.css  --  SOLO colores. style.css lo importa en su primera linea.
+   Es el archivo pensado para ucs (~/.config/ucs/config.json -> files_to_replace):
+   ucs reescribe los #hex que encuentre aqui y no toca el resto del estilo.
+   Los que no quieras que sigan al wallpaper, dejalos fijos o muevelos a style.css.
+   Se recarga con:  swaync-client -rs
+   --------------------------------------------------------------------------- */
+:root {
+  
+  --acento:           #a21cb4;                /* toggles activos, progreso, hover del boton Limpiar */
+
+}
