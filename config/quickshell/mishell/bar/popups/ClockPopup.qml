@@ -1,11 +1,10 @@
 // ---------------------------------------------------------------------------
 //  ClockPopup.qml  --  el "dashboard" chico del reloj: calendario + musica.
 //  Inspirado en el dash de caelestia (calendario a la izquierda, portada y
-//  controles a la derecha).
+//  controles a la derecha). La parte de musica es MediaPanel.qml.
 // ---------------------------------------------------------------------------
 import QtQuick
 import QtQuick.Controls
-import Quickshell.Widgets
 import qs.bar
 import qs.bar.services
 
@@ -169,156 +168,11 @@ Row {
     Rectangle { width: 1; height: cal.height; color: BarConfig.popupBorde }
 
     // ======================================================================
-    //  MUSICA
+    //  MUSICA  (popups/MediaPanel.qml, el mismo del clic derecho en Spotify)
     // ======================================================================
-    Column {
+    MediaPanel {
         id: musica
-        width: 190
-        spacing: 8
-
-        readonly property var p: Players.activo
-        readonly property real progreso: {
-            const q = musica.p
-            if (!q || !q.length) return 0
-            return Math.max(0, Math.min(1, q.position / q.length))
-        }
-        function mmss(s: real): string {
-            s = Math.max(0, Math.floor(s))
-            const m = Math.floor(s / 60), r = s % 60
-            return m + ":" + (r < 10 ? "0" : "") + r
-        }
-
-        // MprisPlayer.position no avisa solo: hay que pedirlo mientras suena
-        Timer {
-            interval: 1000
-            running: root.visible && Players.sonando
-            repeat: true
-            triggeredOnStart: true
-            onTriggered: if (Players.hay) Players.activo.positionChanged()
-        }
-
-        // portada
-        ClippingRectangle {
-            anchors.horizontalCenter: parent.horizontalCenter
-            width: 150; height: 150
-            radius: 14
-            color: BarConfig.popupSuperficie
-
-            Image {
-                id: portada
-                anchors.fill: parent
-                source: Players.portada
-                fillMode: Image.PreserveAspectCrop
-                asynchronous: true
-                cache: true
-                opacity: status === Image.Ready ? 1 : 0
-                Behavior on opacity { NumberAnimation { duration: 250 } }
-            }
-            Text {
-                anchors.centerIn: parent
-                visible: portada.status !== Image.Ready
-                text: Players.hay ? "" : "󰝛"
-                color: BarConfig.textoTenue
-                font.family: BarConfig.fuente
-                font.pixelSize: 48
-            }
-
-            // la portada "respira" mientras suena
-            scale: Players.sonando ? 1 : 0.94
-            Behavior on scale { NumberAnimation { duration: 400; easing.type: Easing.OutBack; easing.overshoot: 1.5 } }
-        }
-
-        Text {
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-            text: Players.hay ? (Players.titulo || "Sin título") : "Nada sonando"
-            color: BarConfig.texto
-            font.family: BarConfig.fuente
-            font.pixelSize: BarConfig.tamFuente
-            font.bold: true
-        }
-        Text {
-            width: parent.width
-            horizontalAlignment: Text.AlignHCenter
-            elide: Text.ElideRight
-            text: Players.hay ? (Players.artista || Players.activo.identity) : "Abre Spotify o cualquier reproductor"
-            color: BarConfig.textoTenue
-            font.family: BarConfig.fuente
-            font.pixelSize: BarConfig.tamFuente - 3
-        }
-
-        // progreso
-        Column {
-            width: parent.width
-            spacing: 3
-            Rectangle {
-                width: parent.width
-                height: 5
-                radius: 2.5
-                color: BarConfig.popupSuperficie
-                Rectangle {
-                    width: parent.width * musica.progreso
-                    height: parent.height
-                    radius: parent.radius
-                    color: BarConfig.acento
-                    Behavior on width { NumberAnimation { duration: 900; easing.type: Easing.Linear } }
-                }
-            }
-            Item {
-                width: parent.width
-                height: t1.implicitHeight
-                Text { id: t1; anchors.left: parent.left; text: musica.p ? musica.mmss(musica.p.position) : "0:00"; color: BarConfig.textoTenue; font.family: BarConfig.fuente; font.pixelSize: 10 }
-                Text { anchors.right: parent.right; text: musica.p && musica.p.length ? musica.mmss(musica.p.length) : "0:00"; color: BarConfig.textoTenue; font.family: BarConfig.fuente; font.pixelSize: 10 }
-            }
-        }
-
-        // controles
-        Row {
-            anchors.horizontalCenter: parent.horizontalCenter
-            spacing: 10
-            Control { icono: "󰒮"; habilitado: Players.hay && Players.activo.canGoPrevious; onClic: Players.anterior() }
-            Control {
-                icono: Players.sonando ? "󰏤" : "󰐊"
-                grande: true
-                habilitado: Players.hay && Players.activo.canTogglePlaying
-                onClic: Players.alternar()
-            }
-            Control { icono: "󰒭"; habilitado: Players.hay && Players.activo.canGoNext; onClic: Players.siguiente() }
-        }
-    }
-
-    component Control: Item {
-        property string icono: ""
-        property bool grande: false
-        property bool habilitado: true
-        signal clic()
-        width: grande ? 44 : 34
-        height: width
-        anchors.verticalCenter: parent.verticalCenter
-        opacity: habilitado ? 1 : 0.35
-
-        Rectangle {
-            anchors.fill: parent
-            radius: width / 2
-            color: parent.grande ? BarConfig.acento : BarConfig.popupSuperficie
-        }
-        Text {
-            anchors.centerIn: parent
-            text: parent.icono
-            color: parent.grande ? BarConfig.activoTexto : BarConfig.texto
-            font.family: BarConfig.fuente
-            font.pixelSize: parent.grande ? 22 : 16
-        }
-        scale: cm.pressed ? 0.85 : (cm.containsMouse ? 1.1 : 1)
-        Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack; easing.overshoot: 2.2 } }
-        MouseArea {
-            id: cm
-            anchors.fill: parent
-            hoverEnabled: true
-            enabled: parent.habilitado
-            cursorShape: Qt.PointingHandCursor
-            onClicked: parent.clic()
-        }
+        width: 200
+        tamPortada: 140
     }
 }

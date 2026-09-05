@@ -7,15 +7,13 @@
   "control-center-layer": "top",
   "layer-shell": true,
   "cssPriority": "user",
-
   "control-center-margin-top": 6,
-  "control-center-margin-bottom": 10,
+  "control-center-margin-bottom": 8,
   "control-center-margin-right": 10,
   "control-center-margin-left": 10,
   "control-center-width": 400,
   "control-center-height": 620,
-  "fit-to-screen": false,
-
+  "fit-to-screen": true,
   "notification-window-width": 380,
   "notification-icon-size": 48,
   "notification-body-image-height": 100,
@@ -31,16 +29,28 @@
   "transition-time": 200,
   "script-fail-notify": true,
   "text-empty": "Sin notificaciones",
-
   "timeout": 8,
   "timeout-low": 4,
   "timeout-critical": 0,
-
+  "scripts": {
+    "bateria": {
+      "app-name": "Batería",
+      "exec": "true"
+    },
+    "critical": {
+      "urgency": "Critical",
+      "exec": "sh -c '~/.config/swaync/scripts/sound.sh critical'"
+    },
+    "normal": {
+      "urgency": "Normal",
+      "exec": "sh -c '~/.config/swaync/scripts/sound.sh normal'"
+    }
+  },
   "widgets": [
     "title",
-    "dnd",
+    "notifications",
     "mpris",
-    "notifications"
+    "buttons-grid"
   ],
   "widget-config": {
     "title": {
@@ -48,8 +58,8 @@
       "clear-all-button": true,
       "button-text": "Limpiar"
     },
-    "dnd": {
-      "text": "No molestar"
+    "notifications": {
+      "vexpand": true
     },
     "mpris": {
       "image-size": 72,
@@ -58,8 +68,49 @@
       "autohide": true,
       "show-album-art": "when-available"
     },
-    "notifications": {
-      "vexpand": true
+    "buttons-grid": {
+      "buttons-per-row": 3,
+      "actions": [
+        {
+          "label": "󰤨",
+          "type": "toggle",
+          "active": true,
+          "command": "sh -c '~/.config/swaync/scripts/radio.sh wifi set'",
+          "update-command": "sh -c '~/.config/swaync/scripts/radio.sh wifi status'"
+        },
+        {
+          "label": "󰂯",
+          "type": "toggle",
+          "active": true,
+          "command": "sh -c '~/.config/swaync/scripts/radio.sh bt set'",
+          "update-command": "sh -c '~/.config/swaync/scripts/radio.sh bt status'"
+        },
+        {
+          "label": "󰂛",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c '~/.config/swaync/scripts/radio.sh dnd set'",
+          "update-command": "sh -c '~/.config/swaync/scripts/radio.sh dnd status'"
+        },
+        {
+          "label": "󰖔",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c '~/.config/swaync/scripts/night.sh set'",
+          "update-command": "sh -c '~/.config/swaync/scripts/night.sh status'"
+        },
+        {
+          "label": "󰀝",
+          "type": "toggle",
+          "active": false,
+          "command": "sh -c '~/.config/swaync/scripts/airplane.sh set'",
+          "update-command": "sh -c '~/.config/swaync/scripts/airplane.sh status'"
+        },
+        {
+          "label": "󰐥",
+          "command": "sh -c 'swaync-client -cp; qs ipc -c mishell call logout open'"
+        }
+      ]
     }
   }
 }

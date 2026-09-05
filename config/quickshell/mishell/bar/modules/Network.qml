@@ -1,6 +1,13 @@
 // ---------------------------------------------------------------------------
 //  Network.qml  --  wifi / cable via Quickshell.Networking (NetworkManager).
 //  Clic: wifi-manager (con pulso). Clic derecho: apagar/encender el wifi.
+//
+//  "Apagar" NO toca la radio (Networking.wifiEnabled / nmcli radio wifi off):
+//  en esta laptop (Intel AX201, wifi y bluetooth en el mismo chip) bloquear
+//  la radio wifi por rfkill deja sin energia tambien al bluetooth. En vez de
+//  eso se desconecta el dispositivo (nmcli device disconnect): NM le apaga el
+//  autoconnect y no vuelve a conectarse hasta que se le pida; el bluetooth ni
+//  se entera. "Encender" es volver a poner autoconnect.
 //  `connected` de cada WifiNetwork no re-dispara bindings, por eso hay un
 //  `tick` cada 5 s que fuerza la re-evaluacion.
 // ---------------------------------------------------------------------------
@@ -29,7 +36,19 @@ Module {
         return null
     }
     readonly property bool cableConectado: { root.tick; return root.cable ? root.cable.connected : false }
+    // apagado = radio apagada (desde fuera) o dispositivo desconectado a mano
     readonly property bool wifiApagado: !Networking.wifiEnabled
+                                     || (root.wifi !== null && !root.wifi.autoconnect)
+
+    function alternarWifi(): void {
+        if (!root.wifi) { Networking.wifiEnabled = !Networking.wifiEnabled; return }
+        if (root.wifiApagado) {
+            if (!Networking.wifiEnabled) Networking.wifiEnabled = true
+            root.wifi.autoconnect = true
+        } else {
+            root.wifi.disconnect()
+        }
+    }
 
     icono: root.wifiApagado ? "󱚼"
          : root.cableConectado ? "󰈀"
@@ -39,7 +58,7 @@ Module {
 
     tooltip: {
         root.tick
-        if (root.wifiApagado) return "Wi-Fi apagado"
+        if (root.wifiApagado) return "Wi-Fi apagado (clic derecho: encender)"
         if (root.redWifi) {
             const s = Math.round((root.redWifi.signalStrength ?? 0) * 100)
             return root.redWifi.name + " (" + s + "%) "
@@ -49,5 +68,5 @@ Module {
     }
 
     onClic: { root.pulso(); Quickshell.execDetached(BarConfig.cmdRed) }
-    onClicDerecho: Networking.wifiEnabled = !Networking.wifiEnabled
+    onClicDerecho: root.alternarWifi()
 }

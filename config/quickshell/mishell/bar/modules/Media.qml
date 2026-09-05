@@ -1,8 +1,14 @@
 // ---------------------------------------------------------------------------
-//  Media.qml  --  lo que suena (custom/mpd de la Waybar, pero por MPRIS).
+//  Media.qml  --  lo que suena en Spotify (custom/mpd de la Waybar, por MPRIS).
 //  Marquee real en pixeles: solo se desplaza si el texto no cabe (o si
-//  BarConfig.mediaScrollSiempre). Clic: play/pause. Rueda: siguiente /
-//  anterior. Clic derecho: traer la ventana del reproductor.
+//  BarConfig.mediaScrollSiempre).
+//
+//  Clic izquierdo (se cuentan dentro de BarConfig.multiClicMs):
+//      1 clic  -> play / pausa
+//      2 clics -> siguiente cancion
+//      3 clics -> cancion anterior
+//  Clic derecho: popup con portada, progreso arrastrable, aleatorio/repetir.
+//  Clic medio: traer la ventana de Spotify.  Rueda: siguiente / anterior.
 // ---------------------------------------------------------------------------
 import QtQuick
 import qs.bar
@@ -11,12 +17,33 @@ import qs.bar.services
 Module {
     id: root
 
+    required property string pantalla
+
     icono: !Players.hay ? "" : (Players.esSpotify ? "" : "")
     colorIcono: Players.sonando ? BarConfig.verde : BarConfig.texto
     tooltip: Players.hay ? (Players.linea + (Players.album ? "\n" + Players.album : "")) : ""
+    activo: BarState.popupActivo("media", root.pantalla)
 
-    onClic:        Players.alternar()
-    onClicDerecho: Players.mostrar()
+    // --- clics multiples ---------------------------------------------------
+    //  No se puede usar doubleClicked del MouseArea: Qt lo manda ADEMAS del
+    //  clicked, y no existe un "triple". Se cuentan a mano y se decide cuando
+    //  pasa la ventana sin un clic nuevo.
+    property int clics: 0
+    Timer {
+        id: multiClic
+        interval: BarConfig.multiClicMs
+        onTriggered: {
+            const n = root.clics
+            root.clics = 0
+            if (n === 1)      Players.alternar()
+            else if (n === 2) { root.pulso(); Players.siguiente() }
+            else              { root.pulso(); Players.anterior() }
+        }
+    }
+    onClic: { root.clics++; multiClic.restart() }
+
+    onClicDerecho: BarState.alternarPopup("media", root.pantalla)
+    onClicMedio:   Players.mostrar()
     onRueda: d => d > 0 ? Players.siguiente() : Players.anterior()
 
     extra: Item {

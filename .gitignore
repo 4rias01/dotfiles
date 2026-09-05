@@ -10,3 +10,6 @@ config/quickshell/mishell/bar/BarColors.qml
 config/starship.toml
 config/waybar/style.css
 config/quickshell/othershell/
+
+# swaync: colores que reescribe ucs (trackeado una vez con git add -f, como BarColors.qml)
+config/swaync/colors.css

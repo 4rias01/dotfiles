@@ -46,17 +46,18 @@ hl.window_rule({
     float = true,
 })
 
-hl.window_rule({ match = { class = "(firefox|brave-browser|zen)" },        opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "(firefox|brave-browser|zen|chromium)" },        opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "code" },                              opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "libreoffice-writer" },                opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "spotify" },                           opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "claude-desktop" },                    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "cohesion" },                          opacity = "1.0 override 1.0 override" })
-hl.window_rule({ match = { class = "obsidian" },                          opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "md.obsidian.Obsidian" },              opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "drracket" },                          opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "org.kde.okular" },                    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "com.github.xournalpp.xournalpp" },    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "org.consequences.ColorSwitcher" },    opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "anki" },    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "waypaper" },                          opacity = "0.9 override 0.9 override" })
 hl.window_rule({ match = { class = "zoom" },                              opacity = "0.9 override 0.9 override" })
 
@@ -66,3 +67,18 @@ hl.window_rule({ match = { class = "^steam_app_.*$" }, opacity = "1.0 override 1
 -- Fix Zoom popups en Hyprland 0.54+
 hl.window_rule({ match = { class = "^(zoom)$", title = "^(menu window)$" },    stay_focused = true })
 hl.window_rule({ match = { class = "^(zoom)$", title = "^(confirm window)$" }, stay_focused = true })
+
+-------------------
+--- LAYER RULES ---
+-------------------
+-- Las capas layer-shell (barra, swaync, wifi-manager) NO son ventanas: las
+-- windowrules de arriba no les aplican. La transparencia de swaync se ajusta
+-- en swaync/style.css (--fondo-barra), no aqui.
+
+-- wifi-manager: los botones de wifi/bluetooth de swaync lo abren arriba a la
+-- derecha, encima del panel (wifi-manager/config.toml); que entre con un pop.
+hl.layer_rule({
+    name  = "wifi-manager-popin",
+    match = { namespace = "^wifi-manager$" },
+    animation = "popin 80%",
+})

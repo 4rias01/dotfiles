@@ -25,6 +25,7 @@ Scope {
 
     BatteryNotifier { id: notificador }
     function probarBateria(pct: int): void { notificador.probar(pct) }
+    function estadoBateria(): string { return notificador.estado() }
 
     // Convivencia con Waybar (ver BarConfig.ocultarSiHayWaybar)
     Process {
@@ -121,7 +122,7 @@ Scope {
 
                     Bubble {
                         retardo: BarConfig.cascada * 3
-                        Media {}
+                        Media { id: media; pantalla: win.pantalla }
                     }
 
                     Bubble {
@@ -147,6 +148,12 @@ Scope {
                 nombre: "reloj"; pantalla: win.pantalla
                 ancla: reloj; anclaHover: reloj.hovered
                 ClockPopup {}
+            }
+
+            Popup {
+                nombre: "media"; pantalla: win.pantalla
+                ancla: media; anclaHover: media.hovered
+                MediaPopup {}
             }
 
             Popup {

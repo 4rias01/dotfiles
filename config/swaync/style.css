@@ -1,21 +1,25 @@
+@import url("colors.css");
 /* ---------------------------------------------------------------------------
    swaync  --  mismo look que la barra de mishell (bar/BarConfig.qml):
    fondo oscuro translucido, texto claro, acento teal, JetBrainsMono.
+   Los COLORES viven en colors.css (la linea de arriba); ese es el archivo
+   que puede reescribir ucs. Aqui va todo lo demas.
    Se recarga con: swaync-client -rs   (estilo)   /   swaync-client -R (config)
    --------------------------------------------------------------------------- */
 
 :root {
-  --fondo:        rgba(24, 24, 37, 0.94);     /* como BarConfig.popupFondo   */
-  --fondo-barra:  rgba(0, 0, 8, 0.70);        /* BarConfig.fondo             */
-  --superficie:   rgba(49, 50, 68, 0.9);      /* BarConfig.popupSuperficie   */
-  --superficie-hover: rgba(69, 71, 90, 0.9);
-  --borde:        #45475a;                    /* BarConfig.popupBorde        */
-  --texto:        #e8eaed;
-  --texto-tenue:  #9399b2;
-  --acento:       #94e2d5;
-  --acento-texto: #121212;
-  --rojo:         #f38ba8;
-  --naranja:      #fab387;
+  /* los colores EDITABLES por UCS estan en colors.css (importado arriba) */
+  --fondo:            alpha(#181825, 0.96);   /* notificaciones flotantes (BarConfig.popupFondo) */
+  --fondo-barra:      alpha(#000008, 0.90);   /* centro de control (BarConfig.fondo) */
+  --superficie:       alpha(#313244, 0.90);   /* tarjetas, botones (BarConfig.popupSuperficie) */
+  --superficie-hover: alpha(#45475a, 0.90);
+  --borde:            #45475a;                /* BarConfig.popupBorde */
+  --texto:            #e8eaed;
+  --texto-tenue:      #9399b2;
+  --acento-texto:     #121212;
+  --rojo:             #f38ba8;                /* notificaciones critical, boton de apagar */
+  --naranja:          #fab387;
+  
   --radio:        14px;
   --radio-chico:  9px;
   --fuente:       "JetBrainsMono Nerd Font";
@@ -182,6 +186,13 @@ progressbar progress {
   color: var(--texto-tenue);
   font-size: 14px;
 }
+/* sin el icono gris de "sliders" que pone GTK cuando la lista esta vacia */
+.control-center-list-placeholder > image {
+  -gtk-icon-size: 0px;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+}
 
 .widget-title {
   margin: 4px 6px 8px 6px;
@@ -202,39 +213,50 @@ progressbar progress {
   color: var(--acento-texto);
 }
 
-/* switch de "No molestar" */
-.widget-dnd {
-  margin: 0 6px 8px 6px;
-  font-size: 14px;
+/* ---------------- botones rapidos (abajo: wifi, bluetooth, no molestar / noche, avion, apagar) ---------------- */
+.widget-buttons-grid {
+  background: transparent;
+  padding: 0;
+  margin: 0 6px 4px 6px;
 }
-.widget-dnd > switch {
+.widget-buttons-grid > flowbox > flowboxchild {
+  padding: 0;
+  margin: 0;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button {
   background: var(--superficie);
+  color: var(--texto);
   border: none;
-  border-radius: 999px;
-  min-width: 44px;
-  min-height: 22px;
-  transition: background 0.2s ease-in-out;
+  border-radius: var(--radio-chico);
+  min-height: 44px;
+  margin: 3px;
+  font-size: 20px;
+  transition: background 0.15s ease-in-out, color 0.15s ease-in-out;
 }
-.widget-dnd > switch:checked {
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+  background: var(--superficie-hover);
+}
+.widget-buttons-grid > flowbox > flowboxchild > button:active {
   background: var(--acento);
+  color: var(--acento-texto);
 }
-.widget-dnd > switch slider {
-  background: var(--texto);
-  border-radius: 100%;
-  min-width: 18px;
-  min-height: 18px;
-  margin: 2px;
-  box-shadow: none;
+/* modo noche / modo avion encendidos */
+.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked,
+.widget-buttons-grid > flowbox > flowboxchild > button.active {
+  background: var(--acento);
+  color: var(--acento-texto);
 }
-.widget-dnd > switch:checked slider {
-  background: var(--acento-texto);
+/* el ultimo es apagar: rojo al pasar el mouse */
+.widget-buttons-grid > flowbox > flowboxchild:last-child > button:hover {
+  background: var(--rojo);
+  color: var(--acento-texto);
 }
 
 /* reproductor dentro del panel */
 .widget-mpris {
   background: transparent;
   padding: 0;
-  margin: 0 0 8px 0;
+  margin: 8px 0 6px 0;
 }
 .widget-mpris-player {
   background: var(--superficie);

@@ -15,6 +15,10 @@ Singleton {
 
     readonly property string home: Quickshell.env("HOME")
     readonly property string scriptsDir: home + "/.config/quickshell/mishell/bar/scripts"
+    // $XDG_RUNTIME_DIR (/run/user/UID): se borra al cerrar sesion, asi que lo
+    // que se guarde ahi sobrevive a recargas y reinicios de qs pero no a un
+    // reinicio de la maquina.
+    readonly property string runtimeDir: Quickshell.env("XDG_RUNTIME_DIR") || "/tmp"
 
     // --- Arranque ----------------------------------------------------------
     // true = si al arrancar mishell ya hay un `waybar` corriendo, la barra
@@ -106,6 +110,14 @@ Singleton {
     // descarga; al enchufar el cargador se reinician todos.
     property var umbralesNotificacion: [20, 10, 5, 1]
     property int umbralCritico: 5     // desde aqui la notificacion es "critical"
+    // Donde se apunta "este umbral ya sono": un archivo y no memoria del
+    // shell, porque cada cambio de wallpaper (ucs) recarga qs y la memoria
+    // se perdia. Al cerrar sesion el archivo desaparece solo.
+    property string archivoAvisosBateria: runtimeDir + "/mishell-bateria.json"
+    // Sonido de los avisos ("" = sin sonido). Los .oga vienen con sound-theme-freedesktop.
+    property var    cmdSonido:     ["paplay"]
+    property string sonidoAviso:   "/usr/share/sounds/freedesktop/stereo/dialog-warning.oga"
+    property string sonidoCritico: "/usr/share/sounds/freedesktop/stereo/suspend-error.oga"
 
     // --- Reloj -------------------------------------------------------------
     // Formatos de Qt (no strftime). "AP" se reemplaza por AM/PM a mano, asi
@@ -115,7 +127,14 @@ Singleton {
     property string locale:         ""    // "" = el del sistema (es_MX)
 
     // --- Media (Spotify) ---------------------------------------------------
-    property string playerPreferido: "spotify"  // si no esta, el que este sonando
+    property string playerPreferido: "spotify"
+    // true  = SOLO se muestra el playerPreferido (Firefox, mpv, etc. se ignoran)
+    // false = si no esta, se muestra el que este sonando o el primero que haya
+    property bool   soloPlayerPreferido: true
+    // Clic izquierdo en el modulo: 1 clic = play/pausa, 2 = siguiente,
+    // 3 = anterior. Esta es la ventana (ms) para contar los clics; el play
+    // /pausa se retrasa esto mismo.
+    property int    multiClicMs:     320
     property int    mediaAnchoMax:   s(200)        // px antes de empezar a desplazar
     property real   mediaVelocidad:  28         // px por segundo del marquee
     property bool   mediaScrollSiempre: false   // true = desplaza aunque quepa

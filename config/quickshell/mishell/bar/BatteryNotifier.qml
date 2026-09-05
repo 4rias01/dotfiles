@@ -5,19 +5,25 @@
 //  avisa UNA sola vez mientras se descarga; al enchufar el cargador se
 //  reinician todos. Si al arrancar ya estamos por debajo de un umbral, avisa
 //  igual. Se manda por notify-send (swaync lo muestra) con un id sincrono,
-//  asi el aviso del 10% reemplaza al del 20% en vez de apilarse.
+//  asi el aviso del 10% reemplaza al del 20% en vez de apilarse, y suena
+//  BarConfig.sonidoAviso / sonidoCritico.
 //
-//  La memoria de "ya avise este umbral" vive en PersistentProperties: es lo
-//  unico que sobrevive a una recarga del shell (cada guardado de config y
-//  cada corrida de ucs recargan). Sin esto, cada recarga volvia a crear este
-//  objeto con la memoria vacia y repetia el aviso del umbral vigente, lo que
-//  parecia "una notificacion por cada punto de bateria".
+//  La memoria de "ya avise este umbral" vive en un ARCHIVO
+//  (BarConfig.archivoAvisosBateria, dentro de $XDG_RUNTIME_DIR), no en el
+//  shell: cada cambio de wallpaper corre ucs, ucs reescribe Theme.qml y
+//  BarColors.qml y eso recarga qs. PersistentProperties sobrevivia a una
+//  recarga limpia pero no a esa (dos recargas seguidas, la primera con el
+//  archivo a medio escribir), y el aviso del umbral vigente volvia a sonar.
+//  El archivo se lee de forma sincrona al crear este objeto y el sistema lo
+//  borra al cerrar sesion, que es justo cuando queremos olvidarlo.
 //
 //  Para probar sin descargar la laptop:
-//      qs ipc -c mishell call bar probarBateria 10
+//      qs ipc -c mishell call bar probarBateria 10     (solo la notificacion)
+//      qs ipc -c mishell call bar estadoBateria        (que umbrales ya sonaron)
 // ---------------------------------------------------------------------------
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.bar
 
@@ -32,11 +38,21 @@ Item {
                                      && dev.state !== UPowerDeviceState.FullyCharged
                                      && dev.state !== UPowerDeviceState.PendingCharge
 
-    PersistentProperties {
-        id: memoria
-        reloadableId: "bateriaAvisos"
-        property var avisados: ({})
+    FileView {
+        id: archivo
+        path: BarConfig.archivoAvisosBateria
+        blockLoading: true      // leer ANTES del primer revisar()
+        printErrors: false      // la primera vez de la sesion no existe
+        adapter: JsonAdapter {
+            id: memoria
+            property list<int> avisados: []
+        }
     }
+    function guardar(lista): void {
+        memoria.avisados = lista
+        archivo.writeAdapter()
+    }
+    function estado(): string { return JSON.stringify(memoria.avisados) }
 
     onPctChanged: revisar()
     onDescargandoChanged: revisar()
@@ -44,20 +60,20 @@ Item {
 
     function revisar(): void {
         if (!root.descargando) {
-            if (Object.keys(memoria.avisados).length) memoria.avisados = {}
+            if (memoria.avisados.length) root.guardar([])
             return
         }
         // el umbral mas bajo que ya cruzamos
         const umbrales = BarConfig.umbralesNotificacion.slice().sort((a, b) => b - a)
         let objetivo = -1
         for (const u of umbrales) if (root.pct <= u) objetivo = u
-        if (objetivo < 0 || memoria.avisados[objetivo]) return
+        if (objetivo < 0 || memoria.avisados.includes(objetivo)) return
 
         // marcar este y todos los de arriba (si saltamos de 25 a 8, el 20 y
         // el 10 no tienen que sonar despues)
-        const nuevo = Object.assign({}, memoria.avisados)
-        for (const u of umbrales) if (u >= objetivo) nuevo[u] = true
-        memoria.avisados = nuevo
+        const nuevo = memoria.avisados.slice()
+        for (const u of umbrales) if (u >= objetivo && !nuevo.includes(u)) nuevo.push(u)
+        root.guardar(nuevo)
         root.notificar(objetivo, root.pct, root.dev.timeToEmpty)
     }
 
@@ -93,6 +109,8 @@ Item {
             "-h", "int:value:" + pct,
             titulo, cuerpo
         ])
+        const sonido = critico ? BarConfig.sonidoCritico : BarConfig.sonidoAviso
+        if (sonido !== "") Quickshell.execDetached(BarConfig.cmdSonido.concat([sonido]))
     }
 
     // Para probar desde IPC: simula estar en `pct` sin tocar el estado real.
