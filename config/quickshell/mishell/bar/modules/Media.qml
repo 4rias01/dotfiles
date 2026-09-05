@@ -3,12 +3,9 @@
 //  Marquee real en pixeles: solo se desplaza si el texto no cabe (o si
 //  BarConfig.mediaScrollSiempre).
 //
-//  Clic izquierdo (se cuentan dentro de BarConfig.multiClicMs):
-//      1 clic  -> play / pausa
-//      2 clics -> siguiente cancion
-//      3 clics -> cancion anterior
-//  Clic derecho: popup con portada, progreso arrastrable, aleatorio/repetir.
-//  Clic medio: traer la ventana de Spotify.  Rueda: siguiente / anterior.
+//  Clic: popup con portada, progreso arrastrable, aleatorio/repetir.
+//  Clic derecho: play / pausa.  Clic medio: traer la ventana de Spotify.
+//  Rueda: siguiente / anterior.
 // ---------------------------------------------------------------------------
 import QtQuick
 import qs.bar
@@ -24,25 +21,8 @@ Module {
     tooltip: Players.hay ? (Players.linea + (Players.album ? "\n" + Players.album : "")) : ""
     activo: BarState.popupActivo("media", root.pantalla)
 
-    // --- clics multiples ---------------------------------------------------
-    //  No se puede usar doubleClicked del MouseArea: Qt lo manda ADEMAS del
-    //  clicked, y no existe un "triple". Se cuentan a mano y se decide cuando
-    //  pasa la ventana sin un clic nuevo.
-    property int clics: 0
-    Timer {
-        id: multiClic
-        interval: BarConfig.multiClicMs
-        onTriggered: {
-            const n = root.clics
-            root.clics = 0
-            if (n === 1)      Players.alternar()
-            else if (n === 2) { root.pulso(); Players.siguiente() }
-            else              { root.pulso(); Players.anterior() }
-        }
-    }
-    onClic: { root.clics++; multiClic.restart() }
-
-    onClicDerecho: BarState.alternarPopup("media", root.pantalla)
+    onClic:        BarState.alternarPopup("media", root.pantalla)
+    onClicDerecho: { root.pulso(); Players.alternar() }
     onClicMedio:   Players.mostrar()
     onRueda: d => d > 0 ? Players.siguiente() : Players.anterior()
 

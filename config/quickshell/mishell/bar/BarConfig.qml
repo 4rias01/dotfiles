@@ -131,10 +131,6 @@ Singleton {
     // true  = SOLO se muestra el playerPreferido (Firefox, mpv, etc. se ignoran)
     // false = si no esta, se muestra el que este sonando o el primero que haya
     property bool   soloPlayerPreferido: true
-    // Clic izquierdo en el modulo: 1 clic = play/pausa, 2 = siguiente,
-    // 3 = anterior. Esta es la ventana (ms) para contar los clics; el play
-    // /pausa se retrasa esto mismo.
-    property int    multiClicMs:     320
     property int    mediaAnchoMax:   s(200)        // px antes de empezar a desplazar
     property real   mediaVelocidad:  28         // px por segundo del marquee
     property bool   mediaScrollSiempre: false   // true = desplaza aunque quepa
@@ -153,8 +149,7 @@ Singleton {
     property int volumenMax:  100
 
     // --- Comandos ----------------------------------------------------------
-    property var    cmdLauncher:              [home + "/.config/rofi/launcher.sh"]
-    property var    cmdLauncherDerecho:       ["killall", "rofi"]
+    property var    cmdLauncher:              [home + "/.config/rofi/launcher.sh"]   // clic derecho en el logo
     property var    cmdCpu:                   ["kitty", "-e", "btop"]
     property var    cmdRed:                   ["wifi-manager", "--toggle"]   // scripts/wifi_menu.sh es la alternativa con wofi
     property var    cmdBluetooth:             ["wifi-manager", "--toggle"]

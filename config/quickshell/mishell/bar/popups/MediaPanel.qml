@@ -1,8 +1,7 @@
 // ---------------------------------------------------------------------------
 //  MediaPanel.qml  --  la columna de "lo que suena": portada, titulo, barra
 //  de progreso ARRASTRABLE y controles (aleatorio, anterior, play, siguiente,
-//  repetir). La usan MediaPopup (clic derecho en el modulo de Spotify) y la
-//  mitad derecha de ClockPopup.
+//  repetir). Lo muestra MediaPopup (clic en el modulo de Spotify).
 //
 //  Progreso: MprisPlayer.position no avisa solo, se le pide cada segundo
 //  mientras suena (positionChanged()). Al soltar el arrastre se manda el

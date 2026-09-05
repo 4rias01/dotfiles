@@ -1,6 +1,8 @@
 // ---------------------------------------------------------------------------
 //  Battery.qml  --  bateria (UPower) + perfil de energia como sufijo.
 //  Clic: popup con el switch ahorro / balanceado / rendimiento.
+//  Clic derecho: pasa al siguiente perfil (ahorro -> balanceado ->
+//  rendimiento -> ahorro; sin rendimiento si el daemon no lo ofrece).
 //  Colores: verde cargando, amarillo <= aviso, rojo <= critico. Parpadea solo
 //  desde BarConfig.bateriaParpadeo (5 %) y descargando.
 // ---------------------------------------------------------------------------
@@ -54,10 +56,14 @@ Module {
 
     activo: BarState.popupActivo("bateria", root.pantalla)
     tooltip: {
-        if (root.llena) return "Cargada · " + PowerProfile.toString(PowerProfiles.profile)
-        const s = root.cargando ? root.dev.timeToFull : root.dev.timeToEmpty
-        const t = root.tiempo(s)
-        return (root.cargando ? "Cargando" : "Descargando") + (t ? " · " + t : "")
+        const perfil = PowerProfile.toString(PowerProfiles.profile)
+        let linea
+        if (root.llena) linea = "Cargada"
+        else {
+            const t = root.tiempo(root.cargando ? root.dev.timeToFull : root.dev.timeToEmpty)
+            linea = (root.cargando ? "Cargando" : "Descargando") + (t ? " · " + t : "")
+        }
+        return linea + "\n" + perfil + " (clic derecho: cambiar)"
     }
 
     function tiempo(seg: real): string {
@@ -67,4 +73,13 @@ Module {
     }
 
     onClic: BarState.alternarPopup("bateria", root.pantalla)
+
+    readonly property var perfiles: PowerProfiles.hasPerformanceProfile
+        ? [PowerProfile.PowerSaver, PowerProfile.Balanced, PowerProfile.Performance]
+        : [PowerProfile.PowerSaver, PowerProfile.Balanced]
+    function ciclarPerfil(): void {
+        const i = root.perfiles.indexOf(PowerProfiles.profile)
+        PowerProfiles.profile = root.perfiles[(i + 1) % root.perfiles.length]
+    }
+    onClicDerecho: { root.pulso(); root.ciclarPerfil() }
 }

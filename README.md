@@ -386,12 +386,12 @@ resto de la paleta. Para que otro color siga al fondo: se declara ahí, se usa c
 
 | Módulo | Clic | Clic derecho | Rueda |
 |---|---|---|---|
-| Launcher (icono de CachyOS) | Rofi | mata Rofi | — |
+| Launcher (icono de CachyOS) | **menú de apagado** (`logout/`) | Rofi | — |
 | Workspaces | ir al workspace | — | anterior / siguiente |
-| Batería | popup: estado, restante, salud, consumo y **switch ahorro / balanceado / rendimiento** (power-profiles-daemon) | — | — |
+| Batería | popup: estado, restante, salud, consumo y **switch ahorro / balanceado / rendimiento** (power-profiles-daemon) | **siguiente perfil** (ahorro → balanceado → rendimiento → ahorro) | — |
 | CPU | `kitty -e btop` | — | — |
-| Reloj | popup: **calendario** (rueda cambia de mes, clic en el título vuelve a hoy) + el panel de música de abajo | cambia el formato (hora ↔ fecha corta) | — |
-| Spotify | 1 clic play / pause, **2 clics siguiente, 3 clics anterior** (clic medio: traer la ventana) | popup: carátula, **barra de progreso arrastrable**, aleatorio / anterior / play / siguiente / repetir (nada → lista → una canción) | siguiente / anterior |
+| Reloj | popup: **calendario** (rueda cambia de mes, clic en el título vuelve a hoy) | cambia el formato (hora ↔ fecha corta) | — |
+| Spotify | popup: carátula, **barra de progreso arrastrable**, aleatorio / anterior / play / siguiente / repetir (nada → lista → una canción); clic medio: traer la ventana | play / pause | siguiente / anterior |
 | Compartir archivos | activa / desactiva | — | — |
 | Wi-Fi | `wifi-manager --toggle` (con pulso; se abre debajo de la barra, arriba a la derecha) | apaga / enciende el wifi (desconecta el dispositivo, no la radio: en esta laptop apagar la radio wifi apaga también el bluetooth) | — |
 | Bluetooth | `wifi-manager --toggle` (con pulso) | apaga / enciende el adaptador | — |
@@ -411,9 +411,7 @@ entren en el margen transparente.
 **Reproductor.** El módulo y los popups solo miran **Spotify** (`BarConfig.playerPreferido`);
 Firefox, mpv o lo que sea que también exponga MPRIS se ignora aunque esté sonando
 (`soloPlayerPreferido = false` vuelve al comportamiento «Spotify, si no el que suene»).
-Los clics se cuentan dentro de `multiClicMs` (320 ms), por eso el play/pause tarda ese
-pelo en reaccionar. El panel de música (`popups/MediaPanel.qml`) es el mismo en el popup
-del reproductor y en la mitad derecha del del reloj.
+El panel de música vive en `popups/MediaPanel.qml` y lo muestra `MediaPopup.qml`.
 
 **Avisos de batería baja (estilo Windows).** `bar/BatteryNotifier.qml` manda una
 notificación por `notify-send` al cruzar **20 %, 10 %, 5 % y 1 %** mientras se descarga
