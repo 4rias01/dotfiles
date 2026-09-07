@@ -33,7 +33,7 @@ PanelWindow {
     //  1. VENTANA
     // ======================================================================
     readonly property bool shown: WallpaperState.abierto
-    visible: shown
+    visible: shown || root.saliendo
 
     // Ocupar toda la pantalla: anclando a los 4 lados el compositor estira
     // la capa hasta llenar el monitor.
@@ -54,6 +54,7 @@ PanelWindow {
             searchInput.text = ""
             root.searchQuery = ""
             root.searchOpen = false
+            root.saliendo = false
         }
     }
 
@@ -87,6 +88,21 @@ PanelWindow {
     property string statusText: ""
     property bool   ready: false
     property var    folderList: []      // subcarpetas encontradas en el scan
+
+    // Tras elegir un fondo el picker se DESVANECE y se cierra, en vez de
+    // quedarse abierto. Mientras `saliendo` todo lo que depende de `ready`
+    // baja a opacidad 0 (la ventana sigue visible para que se vea la
+    // animacion) y al terminar el timer se cierra de verdad. Dura lo mismo
+    // que el fade de entrada del carrusel, y como corre en paralelo con la
+    // transicion de awww, el fondo nuevo aparece "a traves" del picker.
+    property bool   saliendo: false
+    readonly property bool mostrado: root.ready && !root.saliendo
+    Timer { id: salida; interval: WallpaperConfig.fadeOutMs; onTriggered: WallpaperState.cerrar() }
+    function salir(): void {
+        if (root.saliendo) return
+        root.saliendo = true
+        salida.restart()
+    }
 
     Timer { id: applyUnlock; interval: 400; onTriggered: root.isApplying = false }
     Timer { id: statusClear; interval: 2500; onTriggered: root.statusText = "" }
@@ -600,7 +616,7 @@ PanelWindow {
     //  8. APLICAR EL WALLPAPER  +  POST-COMMAND
     // ======================================================================
     function applyWallpaper(filePath, fileName, isVideo) {
-        if (!filePath || root.isApplying) return
+        if (!filePath || root.isApplying || root.saliendo) return
         root.isApplying = true
         applyUnlock.restart()
 
@@ -711,6 +727,7 @@ PanelWindow {
 
         root.statusText = fileName
         statusClear.restart()
+        if (WallpaperConfig.cerrarAlAplicar) root.salir()
     }
 
     function applyCurrent() {
@@ -724,11 +741,12 @@ PanelWindow {
     Rectangle {
         anchors.fill: parent
         color: Theme.veloWallpaper
-        opacity: root.ready ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 250 } }
+        opacity: root.mostrado ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: root.saliendo ? WallpaperConfig.fadeOutMs : 250 } }
 
         MouseArea {          // click fuera -> cerrar
             anchors.fill: parent
+            enabled: !root.saliendo
             onClicked: WallpaperState.cerrar()
         }
     }
@@ -748,8 +766,10 @@ PanelWindow {
         cacheBuffer: root.s(700)
         model: entries
 
-        opacity: root.ready ? 1 : 0
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutQuart } }
+        opacity: root.mostrado ? 1 : 0
+        scale: root.saliendo ? 1.04 : 1     // se aleja un pelo mientras se va
+        Behavior on opacity { NumberAnimation { duration: WallpaperConfig.fadeOutMs; easing.type: Easing.OutQuart } }
+        Behavior on scale   { NumberAnimation { duration: WallpaperConfig.fadeOutMs; easing.type: Easing.OutCubic } }
 
         // Mantiene SIEMPRE el item actual centrado.
         //
@@ -1079,8 +1099,8 @@ PanelWindow {
         z: 20
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
-        anchors.topMargin: root.ready ? root.s(40) : root.s(-120)
-        opacity: root.ready ? 1 : 0
+        anchors.topMargin: root.mostrado ? root.s(40) : root.s(-120)
+        opacity: root.mostrado ? 1 : 0
 
         Behavior on anchors.topMargin { NumberAnimation { duration: 550; easing.type: Easing.OutExpo } }
         Behavior on opacity { NumberAnimation { duration: 400 } }

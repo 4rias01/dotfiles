@@ -64,6 +64,11 @@ Singleton {
     property var transitions: ["fade", "wipe", "grow", "center", "outer", "wave", "random"]
     property int  transitionFps: 120
     property real transitionDuration: 1.2
+
+    // Al elegir un fondo el picker se desvanece y se cierra solo (false = se
+    // queda abierto como antes). fadeOutMs es lo que dura ese desvanecimiento.
+    property bool cerrarAlAplicar: true
+    property int  fadeOutMs: 500
     //  --background=color deja OPACO lo que rodea al video. mpv conserva la
     //  proporcion, asi que un video mas panoramico que el monitor entra con
     //  barras arriba y abajo; sin esta opcion esas barras dependen de lo que
