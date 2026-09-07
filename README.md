@@ -318,7 +318,7 @@ de [ilyamiro/nixos-configuration](https://github.com/ilyamiro/nixos-configuratio
 | Tecla | Acción |
 |---|---|
 | `←` / `→` / rueda | Moverse por el carrusel |
-| `Enter` | Aplicar el wallpaper centrado |
+| `Enter` (o clic en la tarjeta centrada) | Aplicar el wallpaper; el picker se **desvanece y se cierra** mientras entra el fondo nuevo (`cerrarAlAplicar` / `fadeOutMs` en `WallpaperConfig.qml`) |
 | `/` | Buscar por nombre (como en vim) |
 | `Esc` | Cerrar (o salir del buscador) |
 | Clic en un chip | Filtrar por carpeta, o solo videos |
