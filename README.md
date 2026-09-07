@@ -1,7 +1,8 @@
 # dotfiles
 
 Configuración personal de **Hyprland** sobre CachyOS (Arch), con un shell propio hecho en
-**Quickshell** (`mishell`), barra en Waybar, launcher en Rofi y tema propio de SDDM.
+**Quickshell** (`mishell`) que incluye la barra, launcher en Rofi, notificaciones con SwayNC
+y tema propio de SDDM.
 
 > **Estado: en migración.** La idea es mover todo lo que hoy son utilidades sueltas
 > (wlogout, hyprlock, …) a componentes QML dentro de `mishell`.
@@ -21,6 +22,7 @@ Configuración personal de **Hyprland** sobre CachyOS (Arch), con un shell propi
   - [Atajos de teclado](#atajos-de-teclado)
   - [mishell (Quickshell)](#mishell-quickshell)
   - [Selector de wallpapers](#selector-de-wallpapers)
+  - [Barra (mishell)](#barra-mishell)
   - [Colores dinámicos (ucs)](#colores-dinámicos-ucs)
   - [Waybar](#waybar)
   - [Rofi](#rofi)
@@ -36,6 +38,7 @@ Configuración personal de **Hyprland** sobre CachyOS (Arch), con un shell propi
 |---|---|---|---|
 | Menú de apagado | `wlogout` | `mishell/logout/` | ✅ **Completo** |
 | Selector de wallpapers | `waypaper` | `mishell/wallpaper/` | ✅ **Completo** |
+| Barra | `waybar` | `mishell/bar/` | ✅ **Completo** (ver [Barra](#barra-mishell)) |
 | Config de Hyprland | `.conf` (hyprlang) | `.lua` | ✅ **Completo** |
 | Pantalla de bloqueo | `hyprlock` | `mishell/lock/` | 🚧 **Pendiente** |
 | Login | — | `sddm/mi-sddm` (QML propio) | ✅ **Completo** |
@@ -59,9 +62,9 @@ el que se carga es `hyprland.lua`.
 |---|---|
 | Compositor | Hyprland |
 | Shell / widgets | Quickshell (`mishell`) |
-| Barra | Waybar |
+| Barra | Quickshell (`mishell/bar`) |
 | Launcher | Rofi |
-| Notificaciones | SwayNC |
+| Notificaciones | SwayNC (config y estilo propios en `config/swaync/`) |
 | Bloqueo / idle | hyprlock + hypridle |
 | Login | SDDM (tema propio `mi-sddm`) |
 | Fondos | awww (imágenes) + mpvpaper (video) |
@@ -145,7 +148,9 @@ Todo `config/` se enlaza a `~/.config` con symlinks, no se copia:
 ```bash
 ln -s ~/dotfiles/config/hypr       ~/.config/hypr
 ln -s ~/dotfiles/config/quickshell ~/.config/quickshell
-ln -s ~/dotfiles/config/waybar     ~/.config/waybar
+ln -s ~/dotfiles/config/waybar     ~/.config/waybar   # respaldo, ya no arranca sola
+ln -s ~/dotfiles/config/swaync     ~/.config/swaync
+ln -s ~/dotfiles/config/wifi-manager ~/.config/wifi-manager
 ln -s ~/dotfiles/config/rofi       ~/.config/rofi
 ln -s ~/dotfiles/config/kitty      ~/.config/kitty
 ln -s ~/dotfiles/config/fish       ~/.config/fish
@@ -187,13 +192,17 @@ dotfiles/
 │   │   ├── hypridle.conf            → timeouts de brillo / dpms / suspensión
 │   │   ├── hyprlock.conf            → a reemplazar por Quickshell
 │   │   ├── scripts/                 → magic-launcher, smart_fill, rename_spaces
+│   │   ├── shaders/night.frag       → filtro cálido del modo noche (swaync)
 │   │   └── wp/                      → wallpapers activos (los que ve el picker)
 │   ├── quickshell/mishell/
 │   │   ├── shell.qml                → raíz: monta los overlays y expone el IPC
 │   │   ├── config/Theme.qml         → paleta (la reescribe ucs)
 │   │   ├── logout/                  → menú de apagado
-│   │   └── wallpaper/               → selector de wallpapers + scripts/thumbs.sh
-│   ├── waybar/  (config.jsonc, style.css, scripts/)
+│   │   ├── wallpaper/               → selector de wallpapers + scripts/thumbs.sh
+│   │   └── bar/                     → barra: Bar.qml, modules/, popups/, services/, scripts/
+│   ├── swaync/  (config.json, style.css, colors.css → ucs, scripts/ radio.sh night.sh airplane.sh sound.sh)
+│   ├── wifi-manager/config.toml     → posición del panel (arriba a la derecha)
+│   ├── waybar/  (config.jsonc, style.css, scripts/)   → respaldo
 │   ├── rofi/    (config.rasi, launcher.sh)
 │   ├── kitty/  fish/  fastfetch/  starship.toml
 │   └── wlogout/                     → legado, ya reemplazado
@@ -230,7 +239,7 @@ hl.bind("SUPER + E", hl.dsp.exec_cmd(programs.terminal))
 ```
 
 `exec-once` se reemplaza por el evento `hyprland.start` en `modules/autostart.lua`, que
-levanta: `wifi-manager`, `qs -c mishell`, `blueman-applet`, `waybar`, `swaync`, `hypridle`,
+levanta: `wifi-manager`, `qs -c mishell` (que trae la barra), `blueman-applet`, `swaync`, `hypridle`,
 `awww-daemon`, `hyprpolkitagent`, el keyring y las variables de dbus.
 
 Otros detalles: layout `dwindle`, opacidad 0.8/0.75 con lista de excepciones en
@@ -246,7 +255,7 @@ activo, teclado `latam` y gesto de 3 dedos para cambiar de workspace.
 | `SUPER + E` | Terminal (kitty) |
 | `SUPER + F` | Gestor de archivos (nemo) |
 | `SUPER + W` | Launcher (Rofi) |
-| `SUPER + ALT + Space` | Arrancar / matar Waybar |
+| `SUPER + ALT + Space` | Mostrar / ocultar la barra (`qs ipc -c mishell call bar toggle`) |
 | `SUPER + Q` | Cerrar ventana |
 | `SUPER + V` | Alternar flotante |
 | `SUPER + P` | Pseudotile |
@@ -279,7 +288,15 @@ usan los binds:
 ```bash
 qs ipc -c mishell call logout    toggle|open|close
 qs ipc -c mishell call wallpaper toggle|open|close
+qs ipc -c mishell call bar       toggle|open|close
+qs ipc -c mishell call bar       hora                  # cambia el formato del reloj
+qs ipc -c mishell call bar       popup  bateria|reloj|media|brillo|volumen
+qs ipc -c mishell call bar       probarBateria 10      # simula el aviso de batería baja
+qs ipc -c mishell call bar       estadoBateria         # qué umbrales ya avisaron en esta sesión
 ```
+
+> Los handlers se llaman `open`/`close` y no `show`/`hide` porque `show` es un subcomando
+> de `qs ipc` y se lo come el CLI.
 
 El patrón se repite en los dos módulos: un `Singleton` de estado (`LogoutState`,
 `WallpaperState`) con `abierto`/`abrir()`/`cerrar()`/`alternar()`, el `IpcHandler` vive en
@@ -342,6 +359,101 @@ de [ilyamiro/nixos-configuration](https://github.com/ilyamiro/nixos-configuratio
 (imágenes, gif y videos por separado), si se listan videos, alto y paralelismo de las
 miniaturas, transiciones de awww, opciones de mpvpaper, modo de encaje y el post-command.
 
+### Barra (mishell)
+
+`bar/` — reescritura de la Waybar en Quickshell, misma disposición y mismos módulos,
+con animaciones "burbuja" (todo lo que se mueve lo hace con `Easing.OutBack`: los
+módulos rebotan al pasar el mouse y se aplastan al hacer clic —si la burbuja tiene un
+solo módulo, como el reloj o el reproductor, rebota la burbuja entera—, las burbujas
+entran en cascada al arrancar, el indicador del workspace activo se desliza entre botones, los
+popups crecen desde la barra). Referencias: [serpantinum](https://github.com/ilyamiro/serpantinum)
+para los acentos y [caelestia](https://github.com/caelestia-dots/shell) para el panel del reloj.
+
+Arranca con `qs -c mishell` (no hay proceso aparte); `SUPER + ALT + Space` la muestra u
+oculta. Si algún día vuelve Waybar al autostart, `BarConfig.ocultarSiHayWaybar = true`
+hace que la barra arranque oculta cuando detecta un `waybar` corriendo.
+
+**Colores y `ucs`.** La paleta de la barra es fija y vive en `bar/BarConfig.qml`; `ucs`
+no la toca. Los colores que sí deben seguir al wallpaper están aparte, en
+**`bar/BarColors.qml`** (hoy solo `logo`, el icono de CachyOS del launcher). Es el único
+archivo de `bar/` que va en la lista de `ucs`, así el escáner no se lleva por delante el
+resto de la paleta. Para que otro color siga al fondo: se declara ahí, se usa como
+`BarColors.<nombre>` y listo. Está en `.gitignore` como `Theme.qml`.
+
+```
+[ 󰣇 launcher | 1 2 3 4 5 ] [ 󰁹 83% 󰾅 | cpu | ram | temp | mando ]      [ reloj ]      [ spotify ] [ compartir wifi bt brillo vol notif ]
+```
+
+| Módulo | Clic | Clic derecho | Rueda |
+|---|---|---|---|
+| Launcher (icono de CachyOS) | **menú de apagado** (`logout/`) | Rofi | — |
+| Workspaces | ir al workspace | — | anterior / siguiente |
+| Batería | popup: estado, restante, salud, consumo y **switch ahorro / balanceado / rendimiento** (power-profiles-daemon) | **siguiente perfil** (ahorro → balanceado → rendimiento → ahorro) | — |
+| CPU | `kitty -e btop` | — | — |
+| Reloj | popup: **calendario** (rueda cambia de mes, clic en el título vuelve a hoy) | cambia el formato (hora ↔ fecha corta) | — |
+| Spotify | popup: carátula, **barra de progreso arrastrable**, aleatorio / anterior / play / siguiente / repetir (nada → lista → una canción); clic medio: traer la ventana | play / pause | siguiente / anterior |
+| Compartir archivos | activa / desactiva | — | — |
+| Wi-Fi | `wifi-manager --toggle` (con pulso; se abre debajo de la barra, arriba a la derecha) | apaga / enciende el wifi (desconecta el dispositivo, no la radio: en esta laptop apagar la radio wifi apaga también el bluetooth) | — |
+| Bluetooth | `wifi-manager --toggle` (con pulso) | apaga / enciende el adaptador | — |
+| Brillo | popup con slider | — | ±2 % |
+| Volumen | popup con slider (clic en el icono = mute) | `pavucontrol` | ±2 % |
+| Notificaciones | panel de SwayNC | no molestar | — |
+
+Todos tienen tooltip. Solo puede haber un popup abierto; se cierra solo medio segundo
+después de que el mouse sale del módulo y del popup (4 s si se abrió por IPC sin mouse).
+
+**Espacio entre la barra y las ventanas.** La barra reserva `alto + margenSuperior +
+margenInferior` px y Hyprland suma sus `gaps_out` (10). Para acercar las ventanas no hay
+que bajar `margenInferior` (por debajo de 0 el contenido se recorta): se usa
+`BarConfig.recorteZona`, que resta píxeles a la zona reservada y deja que las ventanas
+entren en el margen transparente.
+
+**Reproductor.** El módulo y los popups solo miran **Spotify** (`BarConfig.playerPreferido`);
+Firefox, mpv o lo que sea que también exponga MPRIS se ignora aunque esté sonando
+(`soloPlayerPreferido = false` vuelve al comportamiento «Spotify, si no el que suene»).
+El panel de música vive en `popups/MediaPanel.qml` y lo muestra `MediaPopup.qml`.
+
+**Avisos de batería baja (estilo Windows).** `bar/BatteryNotifier.qml` manda una
+notificación por `notify-send` al cruzar **20 %, 10 %, 5 % y 1 %** mientras se descarga
+(una sola vez por umbral; al enchufar el cargador se reinician) y la acompaña con un
+sonido (`sonidoAviso` / `sonidoCritico` en `BarConfig`, los `.oga` de
+`sound-theme-freedesktop`; `""` lo apaga). Desde el 5 % la urgencia es `critical`. Todas
+usan el mismo id sincrónico, así que el aviso del 10 % reemplaza al del 20 % en vez de
+apilarse. La memoria de «este umbral ya sonó» está en un **archivo** en
+`$XDG_RUNTIME_DIR` (`mishell-bateria.json`), no en el shell: cada cambio de wallpaper
+corre `ucs`, que reescribe `Theme.qml`/`BarColors.qml` y recarga `qs`, y con
+`PersistentProperties` esa recarga doble se llevaba la memoria y el aviso volvía a sonar.
+El archivo lo borra el sistema al cerrar sesión. Se prueba sin descargar nada con
+`qs ipc -c mishell call bar probarBateria 10`; `estadoBateria` muestra la memoria.
+
+**Cómo está armado.** `Bar.qml` es una `PanelWindow` por monitor con tres zonas; cada
+grupo es un `Bubble` (el pill oscuro) y cada módulo hereda de `Module.qml` (icono + texto,
+hover, rebote, tooltip, señales `clic`/`clicDerecho`/`rueda`). Los popups son
+`PopupWindow` (xdg_popup de la barra) anclados al módulo (`Popup.qml`). Lo que necesita
+datos del sistema vive en singletons en `bar/services/`: `SysStats` (CPU/RAM/temp desde
+`/proc` y hwmon), `Brightness` (`brightnessctl`), `Players` (el reproductor MPRIS de Spotify y sus
+acciones: play, siguiente, aleatorio, repetir, seek), `Swaync` (`swaync-client -swb` en tail), `Ds4`,
+`FileSharing`. Batería, perfiles de energía, red, bluetooth, audio y workspaces salen
+directo de los servicios de Quickshell (`UPower`, `PowerProfiles`, `Networking`,
+`Bluetooth`, `Pipewire`, `Hyprland`).
+
+**Todo lo configurable está en `bar/BarConfig.qml`**: `escala` (0.9 = la barra y su tooltip un
+10 % más chicos; los popups tienen tamaño fijo y no la siguen; las medidas en px pasan por `s()`), geometría, fuente, paleta (fija, no
+la toca `ucs`), duraciones y overshoot de las animaciones, workspaces persistentes por
+monitor, umbrales de batería, formatos del reloj, reproductor preferido, velocidad del
+marquee, pasos de brillo/volumen y todos los comandos.
+
+Tres trampas que se llevaron su tiempo (documentadas en los archivos):
+
+- Con la config de Hyprland en **Lua**, `hyprctl dispatch workspace 2` ya no vale: lo
+  envuelve en `hl.dispatch(...)` y espera Lua. Hay que mandar
+  `hl.dsp.focus({ workspace = 2 })` (ver `modules/Workspaces.qml`).
+- El escáner de Quickshell deja de buscar `pragma Singleton` si encuentra una `{` antes,
+  **aunque esté en un comentario**. Por eso el pragma va en la primera línea de todos los
+  singletons de `bar/`.
+- Los iconos de Font Awesome del Nerd Font (`U+F000–U+F2E0`) van como `\uXXXX` o se pierden
+  fácil al copiar; los de Material Design (`U+F0000+`) pueden ir literales.
+
 ### Colores dinámicos (ucs)
 
 El post-command del picker es:
@@ -367,7 +479,52 @@ Por eso esos archivos están en el `.gitignore`: cambian con cada wallpaper y no
 sentido versionarlos. Hace backup en `~/.config-colors-backup` (`ucs restore` deshace) y
 reinicia Waybar al terminar.
 
+### SwayNC
+
+`config/swaync/` — `config.json` (panel a la derecha, 400 px, textos en español) y
+`style.css` con el mismo look de la barra: fondo oscuro (0.9 de opacidad; SwayNC es una
+capa layer-shell, así que las windowrules de Hyprland no le aplican y la transparencia se
+decide en el CSS), bordes redondeados, acento teal, JetBrainsMono. Las notificaciones
+`critical` (como la de batería al 5 %) llevan el borde rojo, y la barra de progreso que
+manda `notify-send -h int:value:N` se pinta con el acento. Se recarga sin reiniciar con
+`swaync-client -R` (config) y `swaync-client -rs` (estilo).
+
+**Colores y `ucs`.** `style.css` no tiene ningún color: los importa de **`colors.css`**
+(primera línea, `@import`), que es el archivo para poner en la lista de `ucs`. Ahí están
+como `#hex` (los translúcidos como `alpha(#hex, 0.9)`) para que `ucs` los pueda reescribir;
+lo que no deba seguir al wallpaper se deja fijo o se mueve a `style.css`. Está en
+`.gitignore` como `BarColors.qml` (se trackea una vez con `git add -f`).
+
+El panel ocupa casi todo el alto (`fit-to-screen`, 8 px del borde inferior). De arriba
+abajo: título + «Limpiar», la lista de notificaciones (crece), el **reproductor** de SwayNC
+(carátula, anterior / play / siguiente, aleatorio, repetir) y abajo del todo una rejilla de
+**6 botones en 2 filas** (`buttons-grid`); todos menos el último son toggles que leen su
+estado real al abrir el panel:
+
+| Botón | Qué hace |
+|---|---|
+| 󰤨 Wi-Fi | `nmcli radio wifi on/off` (`scripts/radio.sh wifi`) |
+| 󰂯 Bluetooth | `bluetoothctl power on/off` (`scripts/radio.sh bt`) |
+| 󰂛 No molestar | `swaync-client -dn/-df` (`scripts/radio.sh dnd`); reemplaza al switch de arriba |
+| 󰖔 Modo noche | filtro cálido para la pantalla: `scripts/night.sh` pone `decoration:screen_shader` con `hypr/shaders/night.frag` (ahí se ajusta la calidez); `modules/night.lua` lo repone tras un `hyprctl reload` |
+| 󰀝 Modo avión | `rfkill block/unblock all` (`scripts/airplane.sh`, hace falta el grupo `rfkill`) |
+| 󰐥 Apagar | cierra el panel y abre el menú de apagado de mishell |
+
+**Sonido.** Cada notificación suena (`scripts` en `config.json` → `scripts/sound.sh`):
+`message.oga` para las normales, `dialog-warning.oga` para las `critical`, nada para las
+`low` ni con «No molestar». Las de batería están excluidas ahí porque ya las hace sonar
+la barra (`BarConfig.sonidoAviso` / `sonidoCritico`), así suenan aunque swaync no esté.
+
+Los comandos de los toggles viven en scripts porque SwayNC parte el `command` con su
+propio parser y se atraganta con `$(...)` y comillas anidadas. SwayNC no tiene barra de
+progreso para el reproductor ni acepta clic derecho en los botones: wifi-manager se abre
+desde el clic izquierdo de wifi/bluetooth en la barra (debajo de ella, arriba a la
+derecha, `config/wifi-manager/config.toml`, entra con `popin` por layerrule).
+
 ### Waybar
+
+> Ya no arranca: la reemplazó la [barra de mishell](#barra-mishell). Queda en el repo como
+> respaldo (`~/.config/waybar/scripts/launch.sh` la levanta a mano).
 
 Tres grupos: **izquierda** launcher + workspaces y batería/CPU/RAM/temperatura/mando DS4;
 **centro** reloj con calendario en el tooltip; **derecha** compartir archivos, red,
@@ -447,7 +604,12 @@ Con `QT_FORCE_STDERR_LOGGING=1` los ves donde esperás.
 | Timeouts de brillo, bloqueo, suspensión | `config/hypr/hypridle.conf` |
 | Colores de los widgets de Quickshell | `config/quickshell/mishell/config/Theme.qml` |
 | Carpeta de fondos, miniaturas, transiciones, post-command | `config/quickshell/mishell/wallpaper/WallpaperConfig.qml` |
-| Módulos de la barra | `config/waybar/config.jsonc` |
+| Barra (geometría, animaciones, comandos, umbrales) | `config/quickshell/mishell/bar/BarConfig.qml` |
+| Colores de la barra que siguen al wallpaper | `config/quickshell/mishell/bar/BarColors.qml` |
+| Notificaciones (posición, timeouts, estilo, botones rápidos) | `config/swaync/config.json`, `config/swaync/style.css` |
+| Colores de SwayNC (los que puede tocar ucs) | `config/swaync/colors.css` |
+| Calidez del modo noche | `config/hypr/shaders/night.frag` |
+| Dónde aparece wifi-manager | `config/wifi-manager/config.toml` (posición/márgenes; reiniciar `wifi-manager`, `--reload` no la aplica) |
 | Pantalla de login | `sddm/mi-sddm/theme.conf` |
 
 Quickshell recarga en caliente: al guardar un `.qml` el shell se refresca solo. Si algo
@@ -458,6 +620,8 @@ propósito y solo silencia el popup de recarga exitosa).
 
 ## Pendientes y notas
 
+- [ ] **ucs:** en `~/.config/ucs/config.json` cambiar `waybar/style.css` por
+      `~/.config/swaync/colors.css` (BarColors.qml ya está).
 - [ ] **Lock screen en Quickshell** para reemplazar hyprlock. Tocar los tres puntos que
       hoy lo invocan: `SUPER + L` en `binds.lua`, los listeners de `hypridle.conf` y el
       botón «Bloquear» de `logout/LogoutOverlay.qml`.

@@ -56,11 +56,17 @@ Variants {
                 onClicked: LogoutState.cerrar()
             }
 
+            Rectangle{
+                anchors.fill: grid
+                color: Theme.colorBoton
+                radius: 40
+            }
+
             Grid {
                 columns: 6
                 id: grid
                 anchors.centerIn: parent
-                spacing: 5
+                spacing: 2
 
                 LogoutButton {
                     icono: "\uf023"

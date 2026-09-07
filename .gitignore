@@ -6,5 +6,10 @@ config/fastfetch/config.jsonc
 config/hypr/modules/decoration.conf
 config/hypr/modules/decoration.lua
 config/quickshell/mishell/config/Theme.qml
+config/quickshell/mishell/bar/BarColors.qml
 config/starship.toml
 config/waybar/style.css
+config/quickshell/othershell/
+
+# swaync: colores que reescribe ucs (trackeado una vez con git add -f, como BarColors.qml)
+config/swaync/colors.css

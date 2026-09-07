@@ -179,9 +179,25 @@ PanelWindow {
     //      false; thumbs.sh solo genera esa miniatura (las demas ya estan y son
     //      mas nuevas que su original). No hace falta ningun boton de recarga.
     // ----------------------------------------------------------------------
+    // La transicion `add` del ListView solo para altas de verdad (un archivo
+    // nuevo en la carpeta). Cuando el modelo se llena ENTERO -primera apertura,
+    // o la primera tras una recarga del shell (ucs reescribe Theme.qml al
+    // aplicar un fondo)- se apaga: con 130 tarjetas animando su alta, el
+    // ListView deja las posiciones congeladas hasta que terminan, y el cambio
+    // de tarjeta actual (la 0 lo es un instante al llenarse el modelo, luego
+    // centerOnCurrent pone la real) caia dentro de ese lapso. Resultado: la
+    // 0 lejos a la izquierda con su ancho de 1.5x y las siguientes apiladas
+    // bajo la actual como si aun midiera 0.5x.
+    property bool animarAltas: true
+    Timer { id: reactivarAltas; interval: 600; onTriggered: root.animarAltas = true }
+
     function rebuild(text) {
         const lines = String(text).split("\n")
         const previo = root.currentPath()
+        if (entries.count === 0) {
+            root.animarAltas = false
+            reactivarAltas.restart()
+        }
 
         // Rutas relativas del scan + set de rutas absolutas que hay AHORA en
         // disco (el set es lo que permite decidir, cuando modelo y scan se
@@ -521,6 +537,10 @@ PanelWindow {
             // ellos la geometria real de la fila. Se vuelve a fijar el indice
             // ademas de la posicion, para que el estado final no dependa de en
             // que orden llegaron el `cat` y el `find`.
+            //
+            // forceLayout() antes de posicionar, para que la vista mida con los
+            // anchos que acaban de cambiar (ver animarAltas).
+            view.forceLayout()
             view.currentIndex = i
             view.positionViewAtIndex(i, ListView.Center)
             root.positioning = false
@@ -782,8 +802,9 @@ PanelWindow {
             }
         }
 
-        // Animacion cuando aparecen items nuevos
+        // Animacion cuando aparecen items nuevos (no al llenar el modelo entero)
         add: Transition {
+            enabled: root.animarAltas
             NumberAnimation { property: "opacity"; from: 0; to: 1; duration: 350 }
             NumberAnimation { property: "scale"; from: 0.6; to: 1; duration: 350; easing.type: Easing.OutBack }
         }

@@ -10,14 +10,14 @@ Rectangle {
     property string atajo: ""
     signal activado()
 
-    implicitWidth: 200
-    implicitHeight: 300
-    radius: 20
+    implicitWidth: 180
+    implicitHeight: 270
+    radius: 40
 
     color: mouse.containsMouse ? Theme.colorBotonHover : Theme.colorBoton
-    border.width: 2
+    border.width: 0
     border.color: mouse.containsMouse ? Theme.colorBordeHover : Theme.colorBorde
-    scale: mouse.containsMouse ? 1.08 : 1.0
+    scale: mouse.containsMouse ? 1.1 : 1.0
     z: mouse.containsMouse ? 1 : 0
 
     Behavior on color { ColorAnimation { duration: Theme.duracionColor } }
@@ -36,7 +36,7 @@ Rectangle {
         
         text: root.icono
         font.family: Theme.fuente
-        font.pixelSize: 70
+        font.pixelSize: 60
         color: mouse.containsMouse ? Theme.texto : Theme.textoSuave
         Behavior on color { ColorAnimation { duration: 120 } }
     }
@@ -52,7 +52,7 @@ Rectangle {
             font.family: Theme.fuente
             text: root.etiqueta
             color: Theme.texto
-            font.pixelSize:18
+            font.pixelSize:17
         }
 
         Text {

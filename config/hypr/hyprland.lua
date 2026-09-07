@@ -13,6 +13,7 @@ require("modules/decoration")
 require("modules/workspaces")
 require("modules/input")
 require("modules/windowrules")
+require("modules/night")        -- repone el modo noche (swaync) tras un reload
 
 
 

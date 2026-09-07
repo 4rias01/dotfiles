@@ -1,0 +1,314 @@
+@import url("colors.css");
+/* ---------------------------------------------------------------------------
+   swaync  --  mismo look que la barra de mishell (bar/BarConfig.qml):
+   fondo oscuro translucido, texto claro, acento teal, JetBrainsMono.
+   Los COLORES viven en colors.css (la linea de arriba); ese es el archivo
+   que puede reescribir ucs. Aqui va todo lo demas.
+   Se recarga con: swaync-client -rs   (estilo)   /   swaync-client -R (config)
+   --------------------------------------------------------------------------- */
+
+:root {
+  /* los colores EDITABLES por UCS estan en colors.css (importado arriba) */
+  --fondo:            alpha(#181825, 0.96);   /* notificaciones flotantes (BarConfig.popupFondo) */
+  --fondo-barra:      alpha(#000008, 0.90);   /* centro de control (BarConfig.fondo) */
+  --superficie:       alpha(#313244, 0.90);   /* tarjetas, botones (BarConfig.popupSuperficie) */
+  --superficie-hover: alpha(#45475a, 0.90);
+  --borde:            #45475a;                /* BarConfig.popupBorde */
+  --texto:            #e8eaed;
+  --texto-tenue:      #9399b2;
+  --acento-texto:     #121212;
+  --rojo:             #f38ba8;                /* notificaciones critical, boton de apagar */
+  --naranja:          #fab387;
+  
+  --radio:        14px;
+  --radio-chico:  9px;
+  --fuente:       "JetBrainsMono Nerd Font";
+}
+
+* {
+  font-family: var(--fuente);
+  font-size: 14px;
+  color: var(--texto);
+  outline: none;
+}
+
+notificationwindow, blankwindow, .blank-window {
+  background: transparent;
+}
+
+/* ---------------- notificaciones flotantes ---------------- */
+.floating-notifications .notification-row {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-row {
+  outline: none;
+  margin: 0;
+  padding: 0;
+}
+
+.notification-background {
+  background: var(--fondo);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  margin: 6px 10px;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+}
+
+.notification {
+  background: transparent;
+  border: none;
+  border-radius: var(--radio);
+  padding: 0;
+  margin: 0;
+}
+
+.notification-content {
+  background: transparent;
+  padding: 10px 12px;
+  border-radius: var(--radio);
+}
+
+.notification-default-action,
+.notification-action {
+  background: transparent;
+  border: none;
+  border-radius: var(--radio);
+  color: var(--texto);
+  transition: background 0.15s ease-in-out;
+}
+.notification-default-action:hover,
+.notification-action:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* botones de accion (Responder, Abrir, ...) */
+.notification-action {
+  background: var(--superficie);
+  border-radius: var(--radio-chico);
+  margin: 0 4px 8px 4px;
+  padding: 4px 10px;
+}
+.notification-action:hover {
+  background: var(--superficie-hover);
+}
+
+.summary {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--texto);
+}
+.time {
+  font-size: 12px;
+  color: var(--texto-tenue);
+  margin-right: 24px;
+}
+.body {
+  font-size: 13px;
+  color: var(--texto);
+}
+.app-name {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+
+.image {
+  border-radius: var(--radio-chico);
+  margin-right: 10px;
+}
+
+/* urgencia */
+.critical .notification-background {
+  border-color: var(--rojo);
+}
+.critical .summary { color: var(--rojo); }
+.low .summary     { color: var(--texto-tenue); }
+
+/* la X */
+.close-button {
+  background: var(--superficie);
+  color: var(--texto);
+  border: none;
+  border-radius: 100%;
+  min-width: 22px;
+  min-height: 22px;
+  margin: 8px 8px 0 0;
+  padding: 0;
+  text-shadow: none;
+  box-shadow: none;
+  transition: background 0.15s ease-in-out;
+}
+.close-button:hover {
+  background: var(--rojo);
+  color: var(--acento-texto);
+}
+
+/* progreso (notify-send -h int:value:N, lo usa el aviso de bateria) */
+progressbar {
+  min-height: 5px;
+  border-radius: 3px;
+  background: var(--superficie);
+  margin: 0 12px 10px 12px;
+}
+progressbar trough {
+  background: var(--superficie);
+  border-radius: 3px;
+  min-height: 5px;
+}
+progressbar progress {
+  background: var(--acento);
+  border-radius: 3px;
+  min-height: 5px;
+}
+
+/* ---------------- centro de control (SUPER + N) ---------------- */
+.control-center {
+  background: var(--fondo-barra);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 8px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+
+.control-center .notification-background {
+  margin: 4px 0;
+  background: var(--superficie);
+  box-shadow: none;
+}
+.control-center .notification-background:hover {
+  background: var(--superficie-hover);
+}
+
+.control-center-list-placeholder {
+  color: var(--texto-tenue);
+  font-size: 14px;
+}
+/* sin el icono gris de "sliders" que pone GTK cuando la lista esta vacia */
+.control-center-list-placeholder > image {
+  -gtk-icon-size: 0px;
+  min-height: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.widget-title {
+  margin: 4px 6px 8px 6px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.widget-title > button {
+  background: var(--superficie);
+  color: var(--texto);
+  border: none;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  transition: background 0.15s ease-in-out;
+}
+.widget-title > button:hover {
+  background: var(--acento);
+  color: var(--acento-texto);
+}
+
+/* ---------------- botones rapidos (abajo: wifi, bluetooth, no molestar / noche, avion, apagar) ---------------- */
+.widget-buttons-grid {
+  background: transparent;
+  padding: 0;
+  margin: 0 6px 4px 6px;
+}
+.widget-buttons-grid > flowbox > flowboxchild {
+  padding: 0;
+  margin: 0;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button {
+  background: var(--superficie);
+  color: var(--texto);
+  border: none;
+  border-radius: var(--radio-chico);
+  min-height: 44px;
+  margin: 3px;
+  font-size: 20px;
+  transition: background 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button:hover {
+  background: var(--superficie-hover);
+}
+.widget-buttons-grid > flowbox > flowboxchild > button:active {
+  background: var(--acento);
+  color: var(--acento-texto);
+}
+/* modo noche / modo avion encendidos */
+.widget-buttons-grid > flowbox > flowboxchild > button.toggle:checked,
+.widget-buttons-grid > flowbox > flowboxchild > button.active {
+  background: var(--acento);
+  color: var(--acento-texto);
+}
+/* el ultimo es apagar: rojo al pasar el mouse */
+.widget-buttons-grid > flowbox > flowboxchild:last-child > button:hover {
+  background: var(--rojo);
+  color: var(--acento-texto);
+}
+
+/* reproductor dentro del panel */
+.widget-mpris {
+  background: transparent;
+  padding: 0;
+  margin: 8px 0 6px 0;
+}
+.widget-mpris-player {
+  background: var(--superficie);
+  border-radius: var(--radio);
+  padding: 10px;
+  margin: 0 6px;
+}
+.widget-mpris-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+.widget-mpris-subtitle {
+  font-size: 12px;
+  color: var(--texto-tenue);
+}
+.widget-mpris-album-art {
+  border-radius: 10px;
+}
+.widget-mpris > box > button {
+  background: transparent;
+  border: none;
+  border-radius: 100%;
+  color: var(--texto);
+}
+.widget-mpris > box > button:hover {
+  background: var(--superficie-hover);
+}
+
+/* grupos de notificaciones (misma app) */
+.notification-group {
+  margin: 0;
+}
+.notification-group-headers {
+  font-weight: 700;
+  color: var(--texto);
+}
+.notification-group-icon,
+.notification-group-collapse-button,
+.notification-group-close-all-button {
+  background: var(--superficie);
+  color: var(--texto);
+  border: none;
+  border-radius: 100%;
+  margin: 4px;
+}
+.notification-group-collapse-button:hover,
+.notification-group-close-all-button:hover {
+  background: var(--acento);
+  color: var(--acento-texto);
+}
+
+scrollbar, scrollbar slider {
+  background: transparent;
+  border: none;
+}

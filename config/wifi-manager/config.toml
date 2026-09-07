@@ -1,0 +1,8 @@
+# wifi-manager  --  ~/.config/wifi-manager/config.toml (symlink a dotfiles).
+# Arriba a la derecha, pegado a la barra: es donde esta el centro de
+# notificaciones (swaync). Se abre con clic derecho en wifi/bluetooth de la barra. La animacion de entrada es una layerrule de
+# Hyprland (hypr/modules/windowrules.lua, namespace wifi-manager).
+position = "top-right"
+margin_top = 40    # debajo de la barra (32 px): que no tape los modulos
+margin_right = 10
+show_on_start = false
