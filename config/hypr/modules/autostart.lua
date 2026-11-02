@@ -21,6 +21,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("wifi-manager")
     hl.exec_cmd("qs -c mishell")
     hl.exec_cmd("blueman-applet &")
+    hl.exec_cmd("~/.config/hypr/scripts/bt-sco-watchdog.sh")   -- reconecta audífonos BT si se cae el micro en llamadas
     hl.exec_cmd("swaync & hypridle")   -- la barra va dentro de mishell (qs -c mishell)
     hl.exec_cmd("awww-daemon")
     hl.exec_cmd("systemctl --user start hyprpolkitagent")

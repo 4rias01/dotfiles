@@ -13,5 +13,5 @@ import Quickshell
 import QtQuick
 
 Singleton {
-    property color logo: "#e93a5b"     // icono de CachyOS del launcher
+    property color logo: "#399c79"     // icono de CachyOS del launcher
 }

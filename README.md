@@ -155,8 +155,7 @@ ln -s ~/dotfiles/config/rofi       ~/.config/rofi
 ln -s ~/dotfiles/config/kitty      ~/.config/kitty
 ln -s ~/dotfiles/config/fish       ~/.config/fish
 ln -s ~/dotfiles/config/fastfetch  ~/.config/fastfetch
-ln -s ~/dotfiles/config/starship.toml ~/.config/starship.toml
-```
+ln -s ~/dotfiles/config/starship.toml ~/.config/starship.toml```
 
 ### 3. Tema de SDDM
 

@@ -30,7 +30,7 @@ Singleton {
     // un 10 % mas chica. Los POPUPS no la siguen: tienen tamano fijo. Las
     // medidas de abajo ya la aplican via s(); si agregas una medida nueva en
     // px de la barra, envuelvela igual.
-    property real escala: 0.9
+    property real escala: 1.0
     function s(v: real): int { return Math.max(1, Math.round(v * escala)) }
 
     // --- Geometria ---------------------------------------------------------
