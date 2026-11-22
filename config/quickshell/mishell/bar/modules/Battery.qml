@@ -9,6 +9,7 @@
 import QtQuick
 import Quickshell.Services.UPower
 import qs.bar
+import qs.bar.services
 
 Module {
     id: root
@@ -18,9 +19,10 @@ Module {
     readonly property var  dev: UPower.displayDevice
     readonly property int  pct: dev.ready ? Math.round(dev.percentage * 100) : 0
     readonly property bool cargando: dev.state === UPowerDeviceState.Charging
-                                  || dev.state === UPowerDeviceState.PendingCharge
+    // enchufada sin cargar: llego al limite de carga (~80 %, LimiteCarga)
+    readonly property bool enPausa: dev.state === UPowerDeviceState.PendingCharge
     readonly property bool llena: dev.state === UPowerDeviceState.FullyCharged
-    readonly property bool enchufada: cargando || llena || !UPower.onBattery
+    readonly property bool enchufada: cargando || enPausa || llena || !UPower.onBattery
 
     readonly property var iconos:      ["󰂎", "󰁻", "󰁾", "󰂁", "󰁹"]
     readonly property var iconosCarga: ["󰢟", "󰂆", "󰢝", "󰂊", "󰂅"]
@@ -43,12 +45,13 @@ Module {
 
     visible: dev.ready && dev.isLaptopBattery
 
-    icono: root.cargando ? root.iconosCarga[root.indice] : root.iconos[root.indice]
+    icono: root.enPausa ? "󰚥"
+         : root.cargando ? root.iconosCarga[root.indice] : root.iconos[root.indice]
     texto: root.pct + "%"
     sufijo: root.perfilIcono
     colorSufijo: root.perfilColor
 
-    color: root.cargando || root.llena ? BarConfig.verde
+    color: root.cargando || root.llena || root.enPausa ? BarConfig.verde
          : root.pct <= BarConfig.bateriaCritico ? BarConfig.rojo
          : root.pct <= BarConfig.bateriaAviso   ? BarConfig.amarillo
          : BarConfig.texto
@@ -59,6 +62,8 @@ Module {
         const perfil = PowerProfile.toString(PowerProfiles.profile)
         let linea
         if (root.llena) linea = "Cargada"
+        else if (root.enPausa) linea = "Enchufada · carga en pausa"
+                                     + (LimiteCarga.activo ? " (límite " + LimiteCarga.limite + " %)" : "")
         else {
             const t = root.tiempo(root.cargando ? root.dev.timeToFull : root.dev.timeToEmpty)
             linea = (root.cargando ? "Cargando" : "Descargando") + (t ? " · " + t : "")
