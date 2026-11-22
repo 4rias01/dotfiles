@@ -3,7 +3,7 @@
 //
 //  Una PanelWindow por monitor con tres zonas, igual que la Waybar:
 //
-//    izquierda  [ launcher | workspaces ] [ bateria cpu ram temp ds4 ]
+//    izquierda  [ launcher | workspaces ] [ bateria cpu ram temp gpu ds4 ]
 //    centro     [ reloj ]
 //    derecha    [ spotify ] [ idioma compartir red bluetooth brillo volumen notif ]
 //
@@ -97,11 +97,13 @@ Scope {
                     }
 
                     Bubble {
+                        id: burbujaStats
                         retardo: BarConfig.cascada
                         Battery { id: bateria; pantalla: win.pantalla }
-                        Cpu {}
-                        Memory {}
-                        Temperature {}
+                        Cpu { id: cpu; pantalla: win.pantalla }
+                        Memory { id: ram; pantalla: win.pantalla }
+                        Temperature { id: temp; pantalla: win.pantalla }
+                        Gpu { id: gpu; pantalla: win.pantalla }
                         Ds4Battery {}
                     }
                 }
@@ -143,6 +145,15 @@ Scope {
                 nombre: "bateria"; pantalla: win.pantalla
                 ancla: bateria; anclaHover: bateria.hovered
                 BatteryPopup {}
+            }
+
+            // panel de sistema: cuelga de la burbuja de stats entera, asi da
+            // igual si se abrio desde CPU, RAM, temperatura o GPU
+            Popup {
+                nombre: "sistema"; pantalla: win.pantalla
+                ancla: burbujaStats
+                anclaHover: cpu.hovered || ram.hovered || temp.hovered || gpu.hovered
+                SystemPopup {}
             }
 
             Popup {

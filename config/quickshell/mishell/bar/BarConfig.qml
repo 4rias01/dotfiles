@@ -137,11 +137,27 @@ Singleton {
     property int    mediaPausaMs:    1500       // pausa al inicio de cada vuelta
 
     // --- Stats -------------------------------------------------------------
-    property int    intervaloStats: 5000
+    // Cada cuanto se muestrean CPU/RAM/red/temp. Tambien es el paso de las
+    // graficas del panel de sistema (puntosHistorial muestras = ventana:
+    // 60 x 2 s = 2 minutos).
+    property int    intervaloStats: 2000
+    property int    intervaloInfo:  30000   // disco, uptime "lento", SO, kernel
+    property int    intervaloGpu:   2000    // nvidia-smi / sysfs amdgpu
+    property int    puntosHistorial: 60
     property int    intervaloDs4:   10000
-    property string hwmonTemp: "/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input"
+    // Sensor de temperatura del CPU: el primer hwmon cuyo `name` coincida, en
+    // este orden. k10temp = AMD (Lenovo LOQ), coretemp = Intel.
+    property var    hwmonNombres: ["k10temp", "zenpower", "coretemp", "cpu_thermal", "acpitz"]
     property int    tempCritica: 100
-    property int    ds4AjusteCarga: 20   // el mando reporta +20 mientras carga (ver ds4-battery.sh)
+    property int    gpuTempAviso: 85        // la GPU se pinta de rojo desde aqui
+
+    // --- Panel de sistema -------------------------------------------------
+    property color colorPanelTitulo:   "#b4befe"   // "Sistema"
+    property color colorGraficaUso:    "#b4befe"   // lavanda: uso de CPU/RAM/GPU
+    property color colorGraficaTemp:   "#eba0ac"   // salmon: temperaturas
+    property color colorGraficaBajada: "#f5c2e7"   // rosa: red, bajada
+    property color colorGraficaSubida: "#b4befe"   // lavanda: red, subida
+    property color tarjetaFondo:       "#0effffff" // relleno de las tarjetas
 
     // --- Teclado -------------------------------------------------------------
     // Las distribuciones se eligen en hypr/modules/input.lua (kb_layout).
@@ -153,6 +169,7 @@ Singleton {
         "English (US)": "Inglés (EE. UU.)",
         "English": "Inglés"
     })
+    property int    ds4AjusteCarga: 20   // el mando reporta +20 mientras carga (ver ds4-battery.sh)
 
     // --- Brillo / volumen --------------------------------------------------
     property int pasoBrillo:  2     // % por tick de rueda
