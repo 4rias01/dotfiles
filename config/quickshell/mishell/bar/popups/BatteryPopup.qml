@@ -7,6 +7,7 @@ import QtQuick
 import Quickshell.Io
 import Quickshell.Services.UPower
 import qs.bar
+import qs.bar.services
 
 Column {
     id: root
@@ -16,9 +17,10 @@ Column {
     readonly property var  dev: UPower.displayDevice
     readonly property int  pct: dev.ready ? Math.round(dev.percentage * 100) : 0
     readonly property bool cargando: dev.state === UPowerDeviceState.Charging
-                                  || dev.state === UPowerDeviceState.PendingCharge
+    // enchufada pero sin cargar: llego al limite de carga (LimiteCarga)
+    readonly property bool enPausa: dev.state === UPowerDeviceState.PendingCharge
     readonly property bool llena: dev.state === UPowerDeviceState.FullyCharged
-    readonly property color colorEstado: root.cargando || root.llena ? BarConfig.verde
+    readonly property color colorEstado: root.cargando || root.llena || root.enPausa ? BarConfig.verde
                                        : root.pct <= BarConfig.bateriaCritico ? BarConfig.rojo
                                        : root.pct <= BarConfig.bateriaAviso   ? BarConfig.amarillo
                                        : BarConfig.texto
@@ -27,6 +29,7 @@ Column {
     // capacidad le queda respecto a la de fabrica) se lee de sysfs cada vez
     // que se abre el popup.
     property int salud: -1
+    onVisibleChanged: if (visible) LimiteCarga.refrescar()
     Process {
         command: ["sh", "-c", `
             for b in /sys/class/power_supply/BAT*; do
@@ -54,7 +57,7 @@ Column {
     Row {
         spacing: 12
         Text {
-            text: root.cargando ? "󰂄" : root.llena ? "󰁹"
+            text: root.enPausa ? "󰚥" : root.cargando ? "󰂄" : root.llena ? "󰁹"
                 : ["󰂎", "󰁻", "󰁾", "󰂁", "󰁹"][Math.min(4, Math.floor(root.pct / 20))]
             color: root.colorEstado
             font.family: BarConfig.fuente
@@ -73,6 +76,7 @@ Column {
             }
             Text {
                 text: root.llena ? "Cargada"
+                    : root.enPausa ? "Enchufada · carga en pausa"
                     : root.cargando ? "Cargando · " + root.tiempo(root.dev.timeToFull)
                     : "Restante · " + root.tiempo(root.dev.timeToEmpty)
                 color: BarConfig.textoTenue
@@ -199,6 +203,81 @@ Column {
                         onClicked: PowerProfiles.profile = seg.modelData
                     }
                 }
+            }
+        }
+    }
+    // --- limite de carga (~80 %) ------------------------------------------
+    //  UPower EnableChargeThreshold (ver services/LimiteCarga.qml). En la
+    //  Lenovo es el "modo conservacion": el firmware corta en ~80 %.
+    Rectangle { width: parent.width; height: 1; color: BarConfig.popupBorde; visible: LimiteCarga.soportado }
+
+    Item {
+        visible: LimiteCarga.soportado
+        width: parent.width
+        height: 40
+
+        Row {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 10
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "󰂑"
+                color: LimiteCarga.activo ? BarConfig.acento : BarConfig.textoTenue
+                font.family: BarConfig.fuente
+                font.pixelSize: 20
+                Behavior on color { ColorAnimation { duration: 200 } }
+            }
+            Column {
+                anchors.verticalCenter: parent.verticalCenter
+                Text {
+                    text: "Limitar carga al " + LimiteCarga.limite + " %"
+                    color: BarConfig.texto
+                    font.family: BarConfig.fuente
+                    font.pixelSize: BarConfig.tamFuente - 2
+                }
+                Text {
+                    text: LimiteCarga.error !== "" ? "Error: " + LimiteCarga.error
+                        : LimiteCarga.activo ? "Ideal si pasa enchufada"
+                        : "Carga hasta el 100 %"
+                    color: LimiteCarga.error !== "" ? BarConfig.rojo : BarConfig.textoTenue
+                    font.family: BarConfig.fuente
+                    font.pixelSize: 10
+                    width: 190
+                    elide: Text.ElideRight
+                }
+            }
+        }
+
+        // switch
+        Rectangle {
+            id: interruptor
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            width: 44; height: 24
+            radius: height / 2
+            color: LimiteCarga.activo ? BarConfig.acento : BarConfig.popupSuperficie
+            opacity: LimiteCarga.ocupado ? 0.6 : 1
+            Behavior on color { ColorAnimation { duration: 200 } }
+
+            Rectangle {
+                width: 18; height: 18
+                radius: 9
+                y: 3
+                x: LimiteCarga.activo ? parent.width - width - 3 : 3
+                color: LimiteCarga.activo ? BarConfig.activoTexto : BarConfig.texto
+                Behavior on x { NumberAnimation { duration: 260; easing.type: Easing.OutBack; easing.overshoot: 1.6 } }
+                Behavior on color { ColorAnimation { duration: 200 } }
+            }
+
+            scale: maLimite.pressed ? 0.9 : 1
+            Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack; easing.overshoot: 2 } }
+
+            MouseArea {
+                id: maLimite
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: LimiteCarga.alternar()
             }
         }
     }

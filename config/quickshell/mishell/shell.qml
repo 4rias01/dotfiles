@@ -52,7 +52,7 @@ Scope {
         function close(): void { BarState.ocultar() }
         // lo mismo que el clic derecho en el reloj, pero desde un bind
         function hora(): void { BarState.alternarHora() }
-        // abre/cierra un popup en el monitor enfocado: bateria | reloj | media | brillo | volumen
+        // abre/cierra un popup en el monitor enfocado: bateria | reloj | media | brillo | volumen | sistema
         function popup(nombre: string): void {
             const m = Hyprland.focusedMonitor
             BarState.alternarPopup(nombre, m ? m.name : Quickshell.screens[0].name)

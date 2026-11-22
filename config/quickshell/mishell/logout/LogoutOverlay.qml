@@ -78,7 +78,13 @@ Variants {
                     icono: "\uf08b"
                     etiqueta: "Cerrar sesión"
                     atajo: "E"
-                    onActivado: LogoutState.ejecutar(["uwsm", "stop"])
+                    // uwsm solo si la sesion la maneja uwsm (existe su unidad
+                    // wayland-wm@...). Con greetd + start-hyprland (Lenovo)
+                    // se sale directo de Hyprland. Ojo: `uwsm check is-active`
+                    // da verdadero aunque no haya uwsm (mira graphical-session).
+                    onActivado: LogoutState.ejecutar(["sh", "-c",
+                        "if systemctl --user -q is-active 'wayland-wm@*.service'; then uwsm stop; "
+                        + "else hyprctl dispatch 'hl.dsp.exit()'; fi"])
                 }
                 LogoutButton {
                     icono: "\uf04c"
