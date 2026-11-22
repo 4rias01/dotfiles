@@ -301,3 +301,9 @@ git add README.md COMANDOS.md && git commit -m "Docs: README de la rama lenovo y
 git log -7 --format=%B | grep -i -E 'claude|co-authored|anthropic'   # -> nada: sin autoría de Claude
 git commit --amend --no-edit      # para incluir esta sección en el commit de docs
 ```
+
+```bash
+# Los dos archivos que quedaban con cambios (ajustes propios de la Lenovo)
+git add config/hypr/modules/monitors.lua config/fish/fish_variables
+git commit -m "Lenovo: escala 1.33 en la pantalla y PATH de fish del usuario santiago-desktop"
+```
