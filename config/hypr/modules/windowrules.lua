@@ -46,7 +46,7 @@ hl.window_rule({
     float = true,
 })
 
-hl.window_rule({ match = { class = "(firefox|brave-browser|zen|chromium)" },        opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "(firefox|brave-browser|zen|chromium|google-chrome)" },        opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "(code|codium|drracket|jetbrains-idea)" },            opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "libreoffice-writer" },                opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "spotify" },                           opacity = "1.0 override 1.0 override" })
@@ -56,7 +56,8 @@ hl.window_rule({ match = { class = "md.obsidian.Obsidian" },              opacit
 hl.window_rule({ match = { class = "org.kde.okular" },                    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "com.github.xournalpp.xournalpp" },    opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "org.consequences.ColorSwitcher" },    opacity = "1.0 override 1.0 override" })
-hl.window_rule({ match = { class = "anki" },    opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "mpv" },                               opacity = "1.0 override 1.0 override" })
+hl.window_rule({ match = { class = "anki" },    						  opacity = "1.0 override 1.0 override" })
 hl.window_rule({ match = { class = "waypaper" },                          opacity = "0.9 override 0.9 override" })
 hl.window_rule({ match = { class = "zoom" },                              opacity = "0.9 override 0.9 override" })
 
