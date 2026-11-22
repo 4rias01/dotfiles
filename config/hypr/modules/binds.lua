@@ -99,3 +99,8 @@ hl.bind(mainMod .. " + Return",         hl.dsp.exec_cmd("qs ipc -c mishell call 
 hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd("waypaper"))
 
 hl.bind("SUPER + Tab", hl.dsp.focus({ workspace = "previous" }))
+
+-- Teclado: alterna espanol latino <-> ingles (kb_layout en input.lua).
+-- switchxkblayout es un comando de hyprctl, no un dispatcher: funciona igual
+-- con la config en Lua. La barra (modulo ES/EN) se entera por el evento.
+hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("hyprctl switchxkblayout all next"))

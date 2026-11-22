@@ -5,8 +5,11 @@
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#input
 hl.config({
     input = {
-        kb_layout  = "latam",
-        kb_variant = "",
+        -- Dos distribuciones: espanol latino e ingles (EE. UU.). Se cambia con
+        -- SUPER + K (binds.lua) o con clic en el modulo ES/EN de la barra.
+        -- La barra lee la activa del evento `activelayout` de Hyprland.
+        kb_layout  = "latam,us",
+        kb_variant = ",",
         kb_model   = "",
         kb_options = "",
         kb_rules   = "",
@@ -15,7 +18,7 @@ hl.config({
 
         sensitivity = 0, -- -1.0 - 1.0, 0 means no modification.
 
-        accel_profile = flat,
+        accel_profile = "flat",   -- string: sin comillas era una variable Lua nil y se ignoraba
         touchpad = {
             natural_scroll = true,
             scroll_factor  = 0.4,
