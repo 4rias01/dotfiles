@@ -14,9 +14,9 @@
   "display": {
     "separator": "➜   ",
     "color": {
-      "separator": "#6d5033",
-      "keys": "#6d5033",
-      "title": "#6d5033"
+      "separator": "#fa5a5e",
+      "keys": "#fa5a5e",
+      "title": "#fa5a5e"
     }
   },
   "modules": [
@@ -33,74 +33,74 @@
     "break",
     {
       "key": "     OS         ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "os"
     },
     /*{
       "key": "    󰌢 Machine    ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "host"
     },
     {
       "key": "     Kernel     ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "kernel"
     },*/
     {
       "key": "    󰅐 Uptime     ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "uptime"
     },
     {
       "key": "     Packages   ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "packages"
     },
     {
       "key": "     WM         ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "wm"
     },
     {
       "key": "     Shell      ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "shell"
     },
     {
       "key": "     Terminal   ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "terminal"
     },
     {
       "key": "     Font       ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "terminalfont"
     },
     {
       "key": "    󰻠 CPU        ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "cpu",
       "format": "{name:-30}" 
     },
     {
       "key": "    󰍛 GPU        ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "gpu",
       "format": "{vendor} {name}"
     },
     /*{
       "key": "    󰑭 Memory     ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "memory"
     },
     {
       "key": "     Wifi       ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "wifi"
     },
     {
       "key": "    󰩟 Local IP   ",
-      "keyColor": "#6d5033",
+      "keyColor": "#fa5a5e",
       "type": "localip",
       "compact": true
     },*/
