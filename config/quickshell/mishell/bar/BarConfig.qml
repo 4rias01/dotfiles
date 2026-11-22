@@ -143,6 +143,17 @@ Singleton {
     property int    tempCritica: 100
     property int    ds4AjusteCarga: 20   // el mando reporta +20 mientras carga (ver ds4-battery.sh)
 
+    // --- Teclado -------------------------------------------------------------
+    // Las distribuciones se eligen en hypr/modules/input.lua (kb_layout).
+    // Aqui: como se ve cada una en la barra (por prefijo del nombre de xkb).
+    property var tecladoEtiquetas: ({ "Spanish": "ES", "English": "EN" })
+    property var tecladoNombres: ({
+        "Spanish (Latin American)": "Español (Latinoamérica)",
+        "Spanish": "Español",
+        "English (US)": "Inglés (EE. UU.)",
+        "English": "Inglés"
+    })
+
     // --- Brillo / volumen --------------------------------------------------
     property int pasoBrillo:  2     // % por tick de rueda
     property int pasoVolumen: 2

@@ -5,7 +5,7 @@
 //
 //    izquierda  [ launcher | workspaces ] [ bateria cpu ram temp ds4 ]
 //    centro     [ reloj ]
-//    derecha    [ spotify ] [ compartir red bluetooth brillo volumen notif ]
+//    derecha    [ spotify ] [ idioma compartir red bluetooth brillo volumen notif ]
 //
 //  Cada [ ] es una Bubble (pill oscuro). Los popups cuelgan de su modulo y
 //  se declaran aqui abajo, junto al tooltip. El aviso de bateria baja vive
@@ -127,6 +127,7 @@ Scope {
 
                     Bubble {
                         retardo: BarConfig.cascada * 4
+                        Idioma {}
                         Sharing {}
                         Network {}
                         Bluetooth {}
