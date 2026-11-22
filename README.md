@@ -23,10 +23,12 @@ y tema propio de SDDM.
   - [mishell (Quickshell)](#mishell-quickshell)
   - [Selector de wallpapers](#selector-de-wallpapers)
   - [Barra (mishell)](#barra-mishell)
+  - [Panel de sistema](#panel-de-sistema)
   - [Colores dinámicos (ucs)](#colores-dinámicos-ucs)
   - [Waybar](#waybar)
   - [Rofi](#rofi)
   - [Tema de SDDM](#tema-de-sddm)
+- [Lenovo LOQ (rama `lenovo`)](#lenovo-loq-rama-lenovo)
 - [Personalización rápida](#personalización-rápida)
 - [Pendientes y notas](#pendientes-y-notas)
 
@@ -88,7 +90,8 @@ sudo pacman -S --needed \
   rofi wofi zenity pavucontrol btop networkmanager blueman upower jq \
   kitty fish starship fastfetch nemo \
   qt6-5compat qt6-declarative gnome-keyring \
-  ttf-jetbrains-mono-nerd ttf-nerd-fonts-symbols
+  ttf-jetbrains-mono-nerd ttf-nerd-fonts-symbols \
+  power-profiles-daemon
 ```
 
 > `awww` y `quickshell` vienen de los repos de **CachyOS** (`cachyos-extra-v4`).
@@ -139,6 +142,8 @@ paru -S spotify cava pipes.sh unimatrix-git
 
 ```bash
 git clone git@github.com:4rias01/dotfiles.git ~/dotfiles
+# en la Lenovo: rama lenovo (por HTTPS si todavia no hay llave SSH)
+git clone --branch lenovo https://github.com/4rias01/dotfiles.git ~/dotfiles
 ```
 
 ### 2. Enlazar los configs
@@ -155,7 +160,8 @@ ln -s ~/dotfiles/config/rofi       ~/.config/rofi
 ln -s ~/dotfiles/config/kitty      ~/.config/kitty
 ln -s ~/dotfiles/config/fish       ~/.config/fish
 ln -s ~/dotfiles/config/fastfetch  ~/.config/fastfetch
-ln -s ~/dotfiles/config/starship.toml ~/.config/starship.toml```
+ln -s ~/dotfiles/config/starship.toml ~/.config/starship.toml
+```
 
 ### 3. Tema de SDDM
 
@@ -255,6 +261,7 @@ activo, teclado `latam` y gesto de 3 dedos para cambiar de workspace.
 | `SUPER + F` | Gestor de archivos (nemo) |
 | `SUPER + W` | Launcher (Rofi) |
 | `SUPER + ALT + Space` | Mostrar / ocultar la barra (`qs ipc -c mishell call bar toggle`) |
+| `SUPER + K` | Cambiar el teclado: español latino ↔ inglés (EE. UU.) |
 | `SUPER + Q` | Cerrar ventana |
 | `SUPER + V` | Alternar flotante |
 | `SUPER + P` | Pseudotile |
@@ -289,7 +296,7 @@ qs ipc -c mishell call logout    toggle|open|close
 qs ipc -c mishell call wallpaper toggle|open|close
 qs ipc -c mishell call bar       toggle|open|close
 qs ipc -c mishell call bar       hora                  # cambia el formato del reloj
-qs ipc -c mishell call bar       popup  bateria|reloj|media|brillo|volumen
+qs ipc -c mishell call bar       popup  bateria|reloj|media|brillo|volumen|sistema
 qs ipc -c mishell call bar       probarBateria 10      # simula el aviso de batería baja
 qs ipc -c mishell call bar       estadoBateria         # qué umbrales ya avisaron en esta sesión
 ```
@@ -380,17 +387,20 @@ resto de la paleta. Para que otro color siga al fondo: se declara ahí, se usa c
 `BarColors.<nombre>` y listo. Está en `.gitignore` como `Theme.qml`.
 
 ```
-[ 󰣇 launcher | 1 2 3 4 5 ] [ 󰁹 83% 󰾅 | cpu | ram | temp | mando ]      [ reloj ]      [ spotify ] [ compartir wifi bt brillo vol notif ]
+[ 󰣇 launcher | 1 2 3 4 5 ] [ 󰁹 83% 󰾅 | cpu | ram | temp | gpu | mando ]      [ reloj ]      [ spotify ] [ ES | compartir wifi bt brillo vol notif ]
 ```
 
 | Módulo | Clic | Clic derecho | Rueda |
 |---|---|---|---|
 | Launcher (icono de CachyOS) | **menú de apagado** (`logout/`) | Rofi | — |
 | Workspaces | ir al workspace | — | anterior / siguiente |
-| Batería | popup: estado, restante, salud, consumo y **switch ahorro / balanceado / rendimiento** (power-profiles-daemon) | **siguiente perfil** (ahorro → balanceado → rendimiento → ahorro) | — |
-| CPU | `kitty -e btop` | — | — |
+| Batería | popup: estado, restante, salud, consumo, **switch ahorro / balanceado / rendimiento** (power-profiles-daemon) y **limitar carga al 80 %** (UPower) | **siguiente perfil** (ahorro → balanceado → rendimiento → ahorro) | — |
+| CPU | **[panel de sistema](#panel-de-sistema)** | `kitty -e btop` | — |
+| RAM / temperatura | panel de sistema | — | — |
+| GPU (temp. de la NVIDIA/AMD) | panel de sistema | — | — |
 | Reloj | popup: **calendario** (rueda cambia de mes, clic en el título vuelve a hoy) | cambia el formato (hora ↔ fecha corta) | — |
 | Spotify | popup: carátula, **barra de progreso arrastrable**, aleatorio / anterior / play / siguiente / repetir (nada → lista → una canción); clic medio: traer la ventana | play / pause | siguiente / anterior |
+| Teclado (`ES` / `EN`) | cambia de distribución (también `SUPER + K`) | igual | cambia |
 | Compartir archivos | activa / desactiva | — | — |
 | Wi-Fi | `wifi-manager --toggle` (con pulso; se abre debajo de la barra, arriba a la derecha) | apaga / enciende el wifi (desconecta el dispositivo, no la radio: en esta laptop apagar la radio wifi apaga también el bluetooth) | — |
 | Bluetooth | `wifi-manager --toggle` (con pulso) | apaga / enciende el adaptador | — |
@@ -429,8 +439,10 @@ El archivo lo borra el sistema al cerrar sesión. Se prueba sin descargar nada c
 grupo es un `Bubble` (el pill oscuro) y cada módulo hereda de `Module.qml` (icono + texto,
 hover, rebote, tooltip, señales `clic`/`clicDerecho`/`rueda`). Los popups son
 `PopupWindow` (xdg_popup de la barra) anclados al módulo (`Popup.qml`). Lo que necesita
-datos del sistema vive en singletons en `bar/services/`: `SysStats` (CPU/RAM/temp desde
-`/proc` y hwmon), `Brightness` (`brightnessctl`), `Players` (el reproductor MPRIS de Spotify y sus
+datos del sistema vive en singletons en `bar/services/`: `SysStats` (CPU/RAM/swap/red/temp
+desde `/proc` y hwmon, con historial para las gráficas), `GpuStats` (NVIDIA por `nvidia-smi`
+o AMD por sysfs), `Teclado` (distribución activa), `LimiteCarga` (umbral de carga de UPower),
+`Brightness` (`brightnessctl`), `Players` (el reproductor MPRIS de Spotify y sus
 acciones: play, siguiente, aleatorio, repetir, seek), `Swaync` (`swaync-client -swb` en tail), `Ds4`,
 `FileSharing`. Batería, perfiles de energía, red, bluetooth, audio y workspaces salen
 directo de los servicios de Quickshell (`UPower`, `PowerProfiles`, `Networking`,
@@ -452,6 +464,31 @@ Tres trampas que se llevaron su tiempo (documentadas en los archivos):
   singletons de `bar/`.
 - Los iconos de Font Awesome del Nerd Font (`U+F000–U+F2E0`) van como `\uXXXX` o se pierden
   fácil al copiar; los de Material Design (`U+F0000+`) pueden ir literales.
+
+### Panel de sistema
+
+`bar/popups/SystemPopup.qml` — inspirado en el panel «Sistema» de noctalia. Se abre con
+clic en CPU, RAM, temperatura o GPU (cuelga de la burbuja de stats entera) o con
+`qs ipc -c mishell call bar popup sistema`. Seis tarjetas en dos columnas:
+
+| Tarjeta | Qué muestra |
+|---|---|
+| CPU | gráfica de uso (lavanda) y temperatura (salmón), valores actuales |
+| Memoria | gráfica de RAM, GiB usados y % |
+| GPU | gráfica de uso (con relleno) y temperatura, uso / VRAM / temp. Se oculta si no hay GPU |
+| Red | bajada (rosa) y subida (lavanda) en la misma escala automática |
+| Sistema | modelo de CPU, GPU, distro, kernel, compositor, tiempo encendido |
+| Recursos | carga (loadavg), RAM, swap y disco `/` |
+
+Las gráficas (`bar/Grafica.qml`, un `Canvas`) salen del historial que guardan `SysStats` y
+`GpuStats` **todo el tiempo** (no solo con el panel abierto), así al abrirlo ya hay datos:
+`puntosHistorial` (60) muestras cada `intervaloStats` (2 s) = los últimos 2 minutos. La
+botonera de arriba abre `btop` o cierra el panel. Colores en `BarConfig` (`colorGrafica*`).
+
+**GPU.** `GpuStats` detecta sola el backend: driver `nvidia` + `nvidia-smi`, o `amdgpu` por
+sysfs. En laptops **híbridas** mira antes `power/runtime_status` de la tarjeta y si está
+`suspended` no llama a `nvidia-smi` (la despertaría solo para medirla, y eso come batería);
+el módulo muestra `zz`.
 
 ### Colores dinámicos (ucs)
 
@@ -591,6 +628,42 @@ Con `QT_FORCE_STDERR_LOGGING=1` los ves donde esperás.
 
 ---
 
+## Lenovo LOQ (rama `lenovo`)
+
+Lenovo LOQ 15ARP9 (83JC): Ryzen 5 7235HS **sin gráfica integrada** + RTX 4050 Max-Q.
+CachyOS la instaló con **noctalia-shell** (sesión por `greetd` + `noctalia-greeter` +
+`start-hyprland`, sin uwsm). Lo que cambió para esta máquina:
+
+- **NVIDIA.** `modules/env.lua` detecta al cargar si la NVIDIA es la *única* GPU
+  (`/sys/module/nvidia_drm` sin `i915`/`xe`/`amdgpu`) y en ese caso pone
+  `LIBVA_DRIVER_NAME`, `__GLX_VENDOR_LIBRARY_NAME`, `GBM_BACKEND`, `NVD_BACKEND` y
+  `ELECTRON_OZONE_PLATFORM_HINT`. En una híbrida no fuerza nada. Antes esto lo hacía
+  `/etc/profile.d/Hyprland.sh` del paquete `cachyos-hypr-noctalia`.
+- **Temperatura del CPU.** Ya no es una ruta fija de `coretemp` (Intel): se busca el
+  primer hwmon de `BarConfig.hwmonNombres` (`k10temp` en AMD).
+- **Límite de carga.** Switch «Limitar carga al 80 %» en el popup de la batería. Usa el
+  mismo mecanismo que noctalia: el método D-Bus `EnableChargeThreshold` de UPower (sin
+  root; polkit lo permite a la sesión activa). En la LOQ se traduce al *modo conservación*
+  de Lenovo (`/sys/class/power_supply/BAT1/charge_types` = `Long_Life`): el firmware corta
+  en ~80 % y el número no se puede cambiar. Con el límite alcanzado la batería queda
+  «enchufada · carga en pausa» (icono de enchufe en verde). A mano:
+  `busctl call org.freedesktop.UPower /org/freedesktop/UPower/devices/battery_BAT1 org.freedesktop.UPower.Device EnableChargeThreshold b true`
+- **Modos de energía.** power-profiles-daemon usa `platform_profile` de la Lenovo:
+  ahorro → `low-power`, balanceado → `balanced`, rendimiento → `performance` (también
+  cambia el EPP de `amd_pstate`). Es el mismo modo que el Fn + Q del teclado.
+- **Teclado.** `kb_layout = "latam,us"`, módulo `ES`/`EN` en la barra y `SUPER + K`.
+- **Cerrar sesión.** El botón del menú de apagado usa `uwsm stop` solo si existe la unidad
+  `wayland-wm@*.service`; si no, `hl.dsp.exit()`. (`uwsm check is-active` da verdadero
+  aunque no haya uwsm, porque mira `graphical-session.target`.)
+- `input.lua`: `accel_profile = flat` sin comillas era una variable Lua `nil` y se
+  ignoraba; ahora es `"flat"`.
+
+noctalia sigue instalado (su greeter es el login), pero ya no se arranca: el autostart de
+`modules/autostart.lua` levanta `qs -c mishell`. Los configs que venían de fábrica quedaron
+en `~/.config-backup-noctalia-20261122/`.
+
+---
+
 ## Personalización rápida
 
 | Quiero cambiar… | Archivo |
@@ -604,6 +677,9 @@ Con `QT_FORCE_STDERR_LOGGING=1` los ves donde esperás.
 | Colores de los widgets de Quickshell | `config/quickshell/mishell/config/Theme.qml` |
 | Carpeta de fondos, miniaturas, transiciones, post-command | `config/quickshell/mishell/wallpaper/WallpaperConfig.qml` |
 | Barra (geometría, animaciones, comandos, umbrales) | `config/quickshell/mishell/bar/BarConfig.qml` |
+| Distribuciones de teclado | `config/hypr/modules/input.lua` (`kb_layout`) + etiquetas en `BarConfig.tecladoEtiquetas` |
+| Gráficas del panel de sistema (colores, ventana de tiempo) | `BarConfig.qml` (`colorGrafica*`, `puntosHistorial`, `intervaloStats`) |
+| Variables de NVIDIA | `config/hypr/modules/env.lua` |
 | Colores de la barra que siguen al wallpaper | `config/quickshell/mishell/bar/BarColors.qml` |
 | Notificaciones (posición, timeouts, estilo, botones rápidos) | `config/swaync/config.json`, `config/swaync/style.css` |
 | Colores de SwayNC (los que puede tocar ucs) | `config/swaync/colors.css` |
@@ -633,4 +709,5 @@ propósito y solo silencia el popup de recarga exitosa).
 - [ ] `smart_fill.sh` quedó obsoleto: el picker aplica la misma regla, pero sacando el
       tamaño de pantalla del monitor en vez de tenerlo hardcodeado en 1920×1080.
 - [ ] `hyprpaper.conf` sigue en el repo pero no se usa (los fondos los pone `awww`).
-- La rama por defecto es `main`; `laptop` es la de esta máquina.
+- La rama por defecto es `main`; `laptop` es la de la laptop anterior y `lenovo` la de
+  la Lenovo LOQ.
